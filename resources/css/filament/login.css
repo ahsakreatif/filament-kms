@@ -1,0 +1,66 @@
+
+body {
+    background: #EEE !important;
+    /* background: linear-gradient(0deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%)  !important;; */
+}
+
+@media screen and (min-width: 1600px) {
+    main {
+        position: absolute;
+        right: 20%;
+    }
+
+    #slogan {
+        left: 20%;
+    }
+
+    .fi-logo {
+        left: 20%;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    main {
+        position: absolute;
+        right: 10%;
+    }
+
+    main:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #552D61;
+        border-radius: 12px;
+        z-index: -9;
+
+        /*box-shadow: -50px 80px 4px 10px #555;*/
+        -webkit-transform: rotate(7deg);
+        -moz-transform: rotate(7deg);
+        -o-transform: rotate(7deg);
+        -ms-transform: rotate(7deg);
+        transform: rotate(7deg);
+    }
+
+    .fi-logo {
+        position: fixed;
+        left: 10%;
+        font-size: 2em;
+        color: cornsilk;
+        height: 150px;
+        margin: 0 auto;
+        @apply !h-24;
+    }
+
+    #slogan {
+        position: fixed;
+        left: 10%;
+        margin-top: 3em;
+        color: #552D61;
+        font-family: Roboto;
+        font-size: 2em;
+        font-weight: bold;
+    }
+}
