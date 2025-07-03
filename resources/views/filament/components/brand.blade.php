@@ -1,0 +1,1 @@
+<img src="{{ asset('logo.png') }}" alt="Logo" class="w-10 h-10"> {{ config('app.name') }}

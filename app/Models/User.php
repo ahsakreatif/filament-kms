@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone',
+        'avatar',
+        'is_active',
+        'last_login_at',
     ];
 
     /**
@@ -43,6 +48,157 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_login_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Get the student profile associated with the user.
+     */
+    public function studentProfile()
+    {
+        return $this->hasOne(StudentProfile::class);
+    }
+
+    /**
+     * Get the lecturer profile associated with the user.
+     */
+    public function lecturerProfile()
+    {
+        return $this->hasOne(LecturerProfile::class);
+    }
+
+    /**
+     * Get the academic staff profile associated with the user.
+     */
+    public function academicStaffProfile()
+    {
+        return $this->hasOne(AcademicStaffProfile::class);
+    }
+
+    /**
+     * Get the user types associated with the user.
+     */
+    public function userTypes()
+    {
+        return $this->belongsToMany(UserType::class, 'user_type_assignments')
+            ->withPivot(['profile_id', 'is_primary', 'assigned_at', 'assigned_by'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the primary user type for this user.
+     */
+    public function getPrimaryTypeAttribute()
+    {
+        return $this->userTypes()->wherePivot('is_primary', true)->first();
+    }
+
+    /**
+     * Check if user has a specific user type.
+     */
+    public function hasUserType($typeName)
+    {
+        return $this->userTypes()->where('name', $typeName)->exists();
+    }
+
+    /**
+     * Get the primary profile for this user.
+     */
+    public function getPrimaryProfileAttribute()
+    {
+        $primaryType = $this->primaryType;
+
+        if (!$primaryType) {
+            return null;
+        }
+
+        switch ($primaryType->name) {
+            case 'student':
+                return $this->studentProfile;
+            case 'lecturer':
+                return $this->lecturerProfile;
+            case 'academic_staff':
+                return $this->academicStaffProfile;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Get user's institutional ID based on primary type.
+     */
+    public function getInstitutionalIdAttribute()
+    {
+        $profile = $this->primaryProfile;
+
+        if (!$profile) {
+            return null;
+        }
+
+        switch ($this->primaryType->name) {
+            case 'student':
+                return $profile->student_id;
+            case 'lecturer':
+                return $profile->lecturer_id;
+            case 'academic_staff':
+                return $profile->academic_id;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Sync roles based on user types.
+     */
+    public function syncRolesFromUserTypes()
+    {
+        // Remove all existing roles first
+        $this->syncRoles([]);
+
+        // Assign roles based on user types
+        foreach ($this->userTypes as $userType) {
+            if ($userType->role_name) {
+                $this->assignRole($userType->role_name);
+            }
+        }
+    }
+
+    /**
+     * Assign a user type and automatically assign the corresponding role.
+     */
+    public function assignUserType(UserType $userType, $profileId = null, $isPrimary = false, $assignedBy = null)
+    {
+        // Create the user type assignment
+        $this->userTypes()->attach($userType->id, [
+            'profile_id' => $profileId,
+            'is_primary' => $isPrimary,
+            'assigned_at' => now(),
+            'assigned_by' => $assignedBy,
+        ]);
+
+        // Assign the corresponding role
+        $userType->assignRoleToUser($this);
+
+        // Auto-create profile if it doesn't exist and user type requires one
+        if ($userType->name === 'student' && !$this->studentProfile) {
+            $this->studentProfile()->create([
+                'student_id' => 'STU' . str_pad($this->id, 6, '0', STR_PAD_LEFT),
+                'status' => 'active',
+            ]);
+        }
+    }
+
+    /**
+     * Remove a user type and automatically remove the corresponding role.
+     */
+    public function removeUserType(UserType $userType)
+    {
+        // Remove the user type assignment
+        $this->userTypes()->detach($userType->id);
+
+        // Remove the corresponding role
+        $userType->removeRoleFromUser($this);
     }
 }
