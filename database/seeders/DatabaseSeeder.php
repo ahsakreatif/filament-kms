@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             LecturerSeeder::class,
             StudentSeeder::class,
             AcademicStaffSeeder::class,
+            CategorySeeder::class,
+            TagSeeder::class,
+            DocumentSeeder::class,
         ]);
     }
 }

@@ -42,10 +42,10 @@ class AppServiceProvider extends ServiceProvider
                 // NavigationItem::make('Roles')->icon('heroicon-o-user-group')->group('User Management')->label('Roles')->url('/admin/roles'),
 
                 // Document Management
-                NavigationItem::make('Documents')->icon('heroicon-o-document-text')->group('Document Management')->label('Documents')->url('/admin/documents'),
-                NavigationItem::make('Categories')->icon('heroicon-o-folder')->group('Document Management')->label('Categories')->url('/admin/categories'),
-                NavigationItem::make('Tags')->icon('heroicon-o-tag')->group('Document Management')->label('Tags')->url('/admin/tags'),
-                NavigationItem::make('Document Approval')->icon('heroicon-o-clock')->group('Document Management')->label('Document Approval')->url('/admin/document-approvals'),
+                // NavigationItem::make('Documents')->icon('heroicon-o-document-text')->group('Document Management')->label('Documents')->url('/admin/documents'),
+                // NavigationItem::make('Categories')->icon('heroicon-o-folder')->group('Document Management')->label('Categories')->url('/admin/categories'),
+                // NavigationItem::make('Tags')->icon('heroicon-o-tag')->group('Document Management')->label('Tags')->url('/admin/tags'),
+                // NavigationItem::make('Document Approval')->icon('heroicon-o-clock')->group('Document Management')->label('Document Approval')->url('/admin/document-approvals'),
 
                 // Forum System
                 NavigationItem::make('Forum Topics')->icon('heroicon-o-chat-bubble-left')->group('Forum System')->label('Forum Topics')->url('/admin/forum-topics'),
