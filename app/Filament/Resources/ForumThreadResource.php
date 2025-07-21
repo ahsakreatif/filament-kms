@@ -4,13 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ForumThreadResource\Pages;
 use App\Models\ForumThread;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-
-
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
+use Kirschbaum\Commentions\Infolists\Components\CommentsEntry;
+use Illuminate\Database\Eloquent\Model;
 
 class ForumThreadResource extends Resource
 {
@@ -65,6 +68,33 @@ class ForumThreadResource extends Resource
                         ])
                         ->helperText('Write the main content of your thread.'),
                 ])->columns(2),
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make([
+                    Infolists\Components\TextEntry::make('title')->label('Thread Title')->columnSpanFull(),
+                    Infolists\Components\TextEntry::make('topic.name')->label('Topic'),
+                    Infolists\Components\TextEntry::make('category.name')->label('Category'),
+                    Infolists\Components\TextEntry::make('tags.name')
+                        ->label('Tags')
+                        ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state),
+                    Infolists\Components\TextEntry::make('documents.title')
+                        ->label('Attached Documents')
+                        ->formatStateUsing(fn($state) => is_array($state) ? implode(', ', $state) : $state),
+                    Infolists\Components\TextEntry::make('user.name')->label('Author'),
+                    Infolists\Components\TextEntry::make('created_at')->label('Created At')->dateTime(),
+                    Infolists\Components\TextEntry::make('updated_at')->label('Last Updated')->dateTime(),
+                ])->columns(2),
+                Infolists\Components\Section::make([
+                    Infolists\Components\TextEntry::make('body')->label('Thread Content')->markdown()->columnSpanFull(),
+                ]),
+                CommentsEntry::make('comments')
+                    ->mentionables(fn (Model $record) => User::all())
+                    ->label('Comments'),
             ]);
     }
 
@@ -133,6 +163,7 @@ class ForumThreadResource extends Resource
             'index' => Pages\ListForumThreads::route('/'),
             'create' => Pages\CreateForumThread::route('/create'),
             'edit' => Pages\EditForumThread::route('/{record}/edit'),
+            'view' => Pages\ViewForumThread::route('/{record}'),
         ];
     }
 } 

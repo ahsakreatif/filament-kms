@@ -9,6 +9,7 @@
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^3.3",
         "filament/filament": "^3.3",
+        "kirschbaum-development/commentions": "^0.6.4",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "pxlrbt/filament-excel": "^2.4"

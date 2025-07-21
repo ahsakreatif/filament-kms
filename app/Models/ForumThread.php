@@ -5,9 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Kirschbaum\Commentions\Contracts\Commentable;
+use Kirschbaum\Commentions\HasComments;
 
-class ForumThread extends Model
+class ForumThread extends Model implements Commentable
 {
+    use HasComments;
+
     protected $fillable = [
         'title',
         'body',
@@ -40,4 +44,4 @@ class ForumThread extends Model
     {
         return $this->belongsToMany(Document::class, 'document_forum_thread');
     }
-} 
+}
