@@ -19,9 +19,7 @@ class ForumTopicSeeder extends Seeder
             'https://www.svgrepo.com/show/530236/location.svg',
             'https://www.svgrepo.com/show/530229/monitor.svg',
             'https://www.svgrepo.com/show/530244/article.svg',
-
-            
-        
+            'https://www.svgrepo.com/show/530248/picture.svg'
         ];
 
         $topics = [
