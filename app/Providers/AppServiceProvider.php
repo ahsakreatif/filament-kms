@@ -48,11 +48,11 @@ class AppServiceProvider extends ServiceProvider
                 // NavigationItem::make('Document Approval')->icon('heroicon-o-clock')->group('Document Management')->label('Document Approval')->url('/admin/document-approvals'),
 
                 // Forum System
-                NavigationItem::make('Forum Topics')->icon('heroicon-o-chat-bubble-left')->group('Forum System')->label('Forum Topics')->url('/admin/forum-topics'),
-                NavigationItem::make('Forum Posts')->icon('heroicon-o-chat-bubble-left-ellipsis')->group('Forum System')->label('Forum Posts')->url('/admin/forum-posts'),
+                // NavigationItem::make('Forum Topics')->icon('heroicon-o-chat-bubble-left')->group('Forum System')->label('Forum Topics')->url('/admin/forum-topics'),
+                // NavigationItem::make('Forum Posts')->icon('heroicon-o-chat-bubble-left-ellipsis')->group('Forum System')->label('Forum Posts')->url('/admin/forum-posts'),
 
                 // Content Moderation
-                NavigationItem::make('Content Flags')->icon('heroicon-o-exclamation-triangle')->group('Forum System')->label('Content Flags')->url('/admin/content-flags'),
+                // NavigationItem::make('Content Flags')->icon('heroicon-o-exclamation-triangle')->group('Forum System')->label('Content Flags')->url('/admin/content-flags'),
 
                 // Analytics
                 NavigationItem::make('User Activities')->icon('heroicon-o-information-circle')->group('Analytics')->label('User Activities')->url('/admin/user-activities'),

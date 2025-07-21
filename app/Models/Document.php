@@ -65,4 +65,9 @@ class Document extends Model
     {
         return $this->hasMany(DocumentView::class);
     }
+
+    public function forumThreads(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(ForumThread::class, 'document_forum_thread');
+    }
 }
