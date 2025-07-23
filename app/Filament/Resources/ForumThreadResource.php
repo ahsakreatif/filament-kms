@@ -165,8 +165,7 @@ class ForumThreadResource extends Resource
                     ->label('Forum View')
                     ->icon('heroicon-o-eye')
                     ->color('primary')
-                    ->url(fn (ForumThread $record): string => ForumThreadResource::getUrl('forum-view', ['record' => $record]))
-                    ->openUrlInNewTab(),
+                    ->url(fn (ForumThread $record): string => ForumThreadResource::getUrl('forum-view', ['record' => $record])),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
