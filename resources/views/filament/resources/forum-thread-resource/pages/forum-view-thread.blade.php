@@ -67,11 +67,11 @@
             </div>
         </div>
 
-        <!-- Comments Section with Commentions -->
+        <!-- Replies Section with Commentions -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div class="p-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                    Comments ({{ $this->record->comments->count() }})
+                    Replies ({{ $this->record->comments->count() }})
                 </h2>
 
                 <!-- Commentions Comments Component -->
