@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -54,41 +55,67 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Remove indexes from documents table
+        // Only drop indexes that are safe to remove (not foreign key indexes)
         Schema::table('documents', function (Blueprint $table) {
-            $table->dropIndex(['title']);
-            $table->dropIndex(['status']);
-            $table->dropIndex(['uploaded_by']);
-            $table->dropIndex(['category_id']);
-            $table->dropIndex(['is_public']);
-            $table->dropIndex(['is_featured']);
-            $table->dropIndex(['created_at']);
+            $this->dropIndexIfExists($table, 'documents_title_index');
+            $this->dropIndexIfExists($table, 'documents_status_index');
+            $this->dropIndexIfExists($table, 'documents_is_public_index');
+            $this->dropIndexIfExists($table, 'documents_is_featured_index');
+            $this->dropIndexIfExists($table, 'documents_created_at_index');
         });
 
-        // Remove indexes from document_downloads table
+        // Only drop timestamp indexes from document_downloads table
         Schema::table('document_downloads', function (Blueprint $table) {
-            $table->dropIndex(['document_id']);
-            $table->dropIndex(['user_id']);
-            $table->dropIndex(['downloaded_at']);
+            $this->dropIndexIfExists($table, 'document_downloads_downloaded_at_index');
         });
 
-        // Remove indexes from document_views table
+        // Only drop timestamp indexes from document_views table
         Schema::table('document_views', function (Blueprint $table) {
-            $table->dropIndex(['document_id']);
-            $table->dropIndex(['user_id']);
-            $table->dropIndex(['viewed_at']);
+            $this->dropIndexIfExists($table, 'document_views_viewed_at_index');
         });
 
-        // Remove indexes from categories table
+        // Only drop safe indexes from categories table
         Schema::table('categories', function (Blueprint $table) {
-            $table->dropIndex(['parent_id']);
-            $table->dropIndex(['is_active']);
-            $table->dropIndex(['sort_order']);
+            $this->dropIndexIfExists($table, 'categories_is_active_index');
+            $this->dropIndexIfExists($table, 'categories_sort_order_index');
         });
 
-        // Remove indexes from tags table
+        // Drop usage_count index from tags table
         Schema::table('tags', function (Blueprint $table) {
-            $table->dropIndex(['usage_count']);
+            $this->dropIndexIfExists($table, 'tags_usage_count_index');
         });
+    }
+
+    /**
+     * Drop an index if it exists
+     */
+    private function dropIndexIfExists(Blueprint $table, string $indexName): void
+    {
+        try {
+            $indexes = $this->getIndexes($table->getTable());
+            if (in_array($indexName, $indexes)) {
+                $table->dropIndex($indexName);
+            }
+        } catch (\Exception $e) {
+            // Silently ignore if index doesn't exist or can't be dropped
+            // This prevents migration failures due to missing indexes
+        }
+    }
+
+    /**
+     * Get all indexes for a table
+     */
+    private function getIndexes(string $tableName): array
+    {
+        $indexes = [];
+        $results = DB::select("SHOW INDEX FROM {$tableName}");
+
+        foreach ($results as $result) {
+            if ($result->Key_name !== 'PRIMARY') {
+                $indexes[] = $result->Key_name;
+            }
+        }
+
+        return array_unique($indexes);
     }
 };

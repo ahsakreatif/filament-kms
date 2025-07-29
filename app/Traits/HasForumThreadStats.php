@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\ForumThreadLike;
 use App\Models\ForumThreadView;
+use App\Services\RecommendationService;
 use Illuminate\Support\Facades\Auth;
 
 trait HasForumThreadStats
@@ -35,8 +36,14 @@ trait HasForumThreadStats
             $this->increment('views_count');
 
             // Update unique views count if this is a new user
-            if ($userId && !$this->views()->where('user_id', $userId)->where('id', '!=', $this->views()->latest()->first()->id)->exists()) {
+            if ($userId && $this->views()->where('user_id', $userId)->count() === 1) {
                 $this->increment('unique_views_count');
+            }
+
+            // Update recommendation preferences
+            if ($userId) {
+                $user = Auth::user();
+                app(RecommendationService::class)->recordView($user, $this);
             }
         }
     }
@@ -64,6 +71,11 @@ trait HasForumThreadStats
                 'liked_at' => now(),
             ]);
             $this->increment('likes_count');
+
+            // Update recommendation preferences
+            $user = Auth::user();
+            app(RecommendationService::class)->recordLike($user, $this);
+
             return true; // Like
         }
     }
@@ -85,7 +97,7 @@ trait HasForumThreadStats
     /**
      * Get the total number of likes
      */
-    public function getLikesCountAttribute(): int
+    public function getRealLikesCountAttribute(): int
     {
         return $this->likes()->count();
     }
@@ -93,7 +105,7 @@ trait HasForumThreadStats
     /**
      * Get the total number of views
      */
-    public function getViewsCountAttribute(): int
+    public function getRealViewsCountAttribute(): int
     {
         return $this->views()->count();
     }
@@ -101,7 +113,7 @@ trait HasForumThreadStats
     /**
      * Get unique views count (by user)
      */
-    public function getUniqueViewsCountAttribute(): int
+    public function getRealUniqueViewsCountAttribute(): int
     {
         return $this->views()->distinct('user_id')->count('user_id');
     }

@@ -191,14 +191,16 @@ class ForumThreadResource extends Resource
                     ->toggleable()
                     ->icon('heroicon-o-heart')
                     ->color('danger')
-                    ->width('80px'),
+                    ->width('80px')
+                    ->formatStateUsing(fn (ForumThread $record) => $record->likes_count ?? 0),
                 Tables\Columns\TextColumn::make('views_count')
                     ->label('Views')
                     ->sortable()
                     ->toggleable()
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->width('80px'),
+                    ->width('80px')
+                    ->formatStateUsing(fn (ForumThread $record) => $record->views_count ?? 0),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('topic_id')

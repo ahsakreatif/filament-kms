@@ -202,4 +202,36 @@ class User extends Authenticatable implements Commenter
         // Remove the corresponding role
         $userType->removeRoleFromUser($this);
     }
+
+    /**
+     * Get the user's tag preferences for recommendations.
+     */
+    public function tagPreferences()
+    {
+        return $this->hasMany(UserTagPreference::class);
+    }
+
+    /**
+     * Get the user's forum threads.
+     */
+    public function forumThreads()
+    {
+        return $this->hasMany(ForumThread::class);
+    }
+
+    /**
+     * Get the user's forum thread likes.
+     */
+    public function forumThreadLikes()
+    {
+        return $this->hasMany(ForumThreadLike::class);
+    }
+
+    /**
+     * Get the user's forum thread views.
+     */
+    public function forumThreadViews()
+    {
+        return $this->hasMany(ForumThreadView::class);
+    }
 }
