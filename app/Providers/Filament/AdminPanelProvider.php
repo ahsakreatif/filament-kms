@@ -65,8 +65,8 @@ class AdminPanelProvider extends PanelProvider
                     ->collapsed(true),
             ])
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ForumThreadResource\Pages;
 
 use App\Filament\Resources\ForumThreadResource;
+use App\Filament\Widgets\ForumThreadStatsWidget;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Model;
@@ -22,4 +23,11 @@ class ListForumThreads extends ListRecords
     {
         return $this->getResource()::getUrl('view', ['record' => $record]);
     }
-} 
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ForumThreadStatsWidget::class,
+        ];
+    }
+}

@@ -5,6 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ForumThreadResource\Pages;
 use App\Models\ForumThread;
 use App\Models\User;
+use App\Services\ForumThreadStatsService;
+use Filament\Tables\Columns\Layout\Split;
+use Filament\Tables\Columns\Layout\Stack;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,6 +19,8 @@ use Kirschbaum\Commentions\Filament\Infolists\Components\CommentsEntry;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Tables\Actions\Action;
 use Filament\Actions\Action as PageAction;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Notifications\Notification;
 
 class ForumThreadResource extends Resource
 {
@@ -107,6 +112,30 @@ class ForumThreadResource extends Resource
                     ])
                     ->columns(2),
 
+                Infolists\Components\Section::make('Statistics')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('likes_count')
+                            ->label('Total Likes')
+                            ->icon('heroicon-o-heart')
+                            ->color('danger'),
+                        Infolists\Components\TextEntry::make('views_count')
+                            ->label('Total Views')
+                            ->icon('heroicon-o-eye')
+                            ->color('info'),
+                        Infolists\Components\TextEntry::make('unique_views_count')
+                            ->label('Unique Views')
+                            ->icon('heroicon-o-users')
+                            ->color('success'),
+                        Infolists\Components\TextEntry::make('is_liked_by_current_user')
+                            ->label('Liked by You')
+                            ->state(function (ForumThread $record): string {
+                                return $record->isLikedByCurrentUser() ? 'Yes' : 'No';
+                            })
+                            ->icon('heroicon-o-heart')
+                            ->color(fn (ForumThread $record): string => $record->isLikedByCurrentUser() ? 'danger' : 'gray'),
+                    ])
+                    ->columns(2),
+
                 Infolists\Components\Section::make('Comments')
                     ->schema([
                         CommentsEntry::make('comments')
@@ -120,57 +149,99 @@ class ForumThreadResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('user.avatar')
+                    ->label('Author')
+                    ->circular()
+                    ->defaultImageUrl(function ($record) {
+                        $initials = collect(explode(' ', $record->user->name))->map(function ($segment) {
+                            return strtoupper(substr($segment, 0, 1));
+                        })->join('');
+                        return 'https://ui-avatars.com/api/?name=' . urlencode($initials) . '&color=FFFFFF&background=111827';
+                    })
+                    ->sortable()
+                    ->toggleable()
+                    ->width('40px'),
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false)
-                    ->wrap()
-                    ->extraAttributes(['class' => 'whitespace-normal']),
+                    ->weight('bold')
+                    ->grow(),
+                /* Tables\Columns\TagsColumn::make('tags.name')
+                    ->label('Tags')
+                    ->toggleable()
+                    ->color('gray')
+                    ->visibleFrom('md'), */
                 Tables\Columns\TextColumn::make('topic.name')
                     ->label('Topic')
                     ->sortable()
                     ->toggleable()
                     ->wrap()
-                    ->extraAttributes(['class' => 'whitespace-normal'])
+                    ->badge()
                     ->visibleFrom('md'),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Category')
-                    ->sortable()
-                    ->toggleable()
-                    ->wrap()
-                    ->extraAttributes(['class' => 'whitespace-normal']),
-                Tables\Columns\TagsColumn::make('tags.name')
-                    ->label('Tags')
-                    ->toggleable()
-                    ->wrap()
-                    ->extraAttributes(['class' => 'whitespace-normal']),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Author')
-                    ->sortable()
-                    ->toggleable()
-                    ->wrap()
-                    ->extraAttributes(['class' => 'whitespace-normal']),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->dateTime('M j, Y g:i A')
                     ->sortable()
                     ->toggleable()
-                    ->wrap()
-                    ->extraAttributes(['class' => 'whitespace-normal']),
+                    // ->wrap()
+                    ->visibleFrom('lg'),
+                Tables\Columns\TextColumn::make('likes_count')
+                    ->label('Likes')
+                    ->sortable()
+                    ->toggleable()
+                    ->icon('heroicon-o-heart')
+                    ->color('danger')
+                    ->width('80px'),
+                Tables\Columns\TextColumn::make('views_count')
+                    ->label('Views')
+                    ->sortable()
+                    ->toggleable()
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->width('80px'),
             ])
             ->filters([
-
+                Tables\Filters\SelectFilter::make('topic_id')
+                    ->label('Topic')
+                    ->relationship('topic', 'name')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Category')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
+                Tables\Filters\SelectFilter::make('tags')
             ])
             ->actions([
-                Action::make('forum_view')
-                    ->label('Forum View')
-                    ->icon('heroicon-o-eye')
-                    ->color('primary')
-                    ->url(fn (ForumThread $record): string => ForumThreadResource::getUrl('forum-view', ['record' => $record])),
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Action::make('like')
+                        ->label(fn (ForumThread $record): string => $record->isLikedByCurrentUser() ? 'Unlike' : 'Like')
+                        ->icon(fn (ForumThread $record): string => $record->isLikedByCurrentUser() ? 'heroicon-o-heart' : 'heroicon-o-heart')
+                        ->color(fn (ForumThread $record): string => $record->isLikedByCurrentUser() ? 'danger' : 'gray')
+                        ->action(function (ForumThread $record) {
+                            $isLiked = $record->toggleLike();
+                            $message = $isLiked ? 'Thread liked successfully!' : 'Thread unliked successfully!';
+
+                            Notification::make()
+                                ->title($message)
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading(fn (ForumThread $record): string => $record->isLikedByCurrentUser() ? 'Unlike Thread' : 'Like Thread')
+                        ->modalDescription(fn (ForumThread $record): string => $record->isLikedByCurrentUser()
+                            ? 'Are you sure you want to unlike this thread?'
+                            : 'Are you sure you want to like this thread?'),
+                ])
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->tooltip('Thread Actions'),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ])
+            ->recordUrl(fn (ForumThread $record): string => ForumThreadResource::getUrl('view', ['record' => $record]));
     }
 
     public static function getRelations(): array
@@ -186,8 +257,9 @@ class ForumThreadResource extends Resource
             'index' => Pages\ListForumThreads::route('/'),
             'create' => Pages\CreateForumThread::route('/create'),
             'edit' => Pages\EditForumThread::route('/{record}/edit'),
-            'view' => Pages\ViewForumThread::route('/{record}'),
-            'forum-view' => Pages\ForumViewThread::route('/{record}/forum-view'),
+            // 'view' => Pages\ViewForumThread::route('/{record}'),
+            'view' => Pages\ForumViewThread::route('/{record}'),
+            'stats' => Pages\ThreadStats::route('/{record}/stats'),
         ];
     }
 }
