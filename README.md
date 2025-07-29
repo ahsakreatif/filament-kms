@@ -1,61 +1,236 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Knowledge Management System (KMS)
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://img.shields.io/badge/Laravel-12.x-red.svg" alt="Laravel Version">
+  <img src="https://img.shields.io/badge/Filament-3.x-blue.svg" alt="Filament Version">
+  <img src="https://img.shields.io/badge/PHP-8.2+-green.svg" alt="PHP Version">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
 </p>
 
-## About Laravel
+## 📚 About KMS
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The Knowledge Management System (KMS) is a comprehensive academic knowledge sharing platform built with **Laravel 12** and **FilamentPHP 3**. It facilitates document management, collaborative learning, and knowledge sharing among university stakeholders including administrators, lecturers, students, and academic staff.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Key Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🔐 Multi-Role Authentication
+- **Admin (Superuser)**: System management and oversight
+- **Lecturer (Dosen)**: Primary knowledge contributor
+- **Student (Mahasiswa)**: Active user accessing resources
+- **Academic Staff (Akademik)**: Academic unit administration
 
-## Learning Laravel
+### 📄 Document Management
+- Upload and manage academic documents (PDF, DOC, DOCX, PPT, etc.)
+- Version control and document history
+- Advanced search and filtering capabilities
+- Download tracking and analytics
+- Document approval workflow
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 🏷️ Tag & Category System
+- Hierarchical category structure
+- Tag-based classification
+- Advanced search and filtering
+- Tag analytics and usage statistics
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 💬 Forum System
+- Topic creation and management
+- Thread-based discussions
+- User reputation system
+- Content moderation tools
+- Search and filtering capabilities
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🤖 AI-Powered Recommendations
+- Intelligent content suggestions
+- Personalized document recommendations
+- Forum topic recommendations based on user interests
 
-## Laravel Sponsors
+### 📊 Analytics & Statistics
+- System usage dashboard
+- Document upload statistics
+- Forum activity tracking
+- User engagement metrics
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🚀 Technology Stack
 
-### Premium Partners
+- **Backend**: Laravel 12.x
+- **Admin Panel**: FilamentPHP 3.x
+- **Database**: MySQL/PostgreSQL
+- **Frontend**: Blade templates with Alpine.js
+- **Authentication**: Laravel's built-in auth with role-based access
+- **File Management**: Laravel Storage
+- **Search**: Laravel Scout (configurable)
+- **Testing**: Pest PHP
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 📋 Requirements
 
-## Contributing
+- PHP 8.2 or higher
+- Composer 2.x
+- Node.js 18+ and NPM
+- MySQL 8.0+ or PostgreSQL 13+
+- Web server (Apache/Nginx)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🛠️ Installation
 
-## Code of Conduct
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd kms
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Install PHP dependencies**
+   ```bash
+   composer install
+   ```
 
-## Security Vulnerabilities
+3. **Install Node.js dependencies**
+   ```bash
+   npm install
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+4. **Environment setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## License
+5. **Configure database**
+   ```bash
+   # Edit .env file with your database credentials
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=kms_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. **Run migrations and seeders**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+7. **Build assets**
+   ```bash
+   npm run build
+   ```
+
+8. **Start the development server**
+   ```bash
+   php artisan serve
+   ```
+
+## 👥 User Roles & Permissions
+
+### Admin (Superuser)
+- System configuration and management
+- User role management
+- Content moderation
+- System analytics and statistics
+- Tag and category management
+
+### Lecturer (Dosen)
+- Document upload and management
+- Forum participation
+- Access to teaching materials
+- AI-powered content recommendations
+
+### Student (Mahasiswa)
+- Document access and download
+- Forum participation
+- Personalized content recommendations
+- Study material access
+
+### Academic Staff (Akademik)
+- Academic document validation
+- Thesis and proposal access
+- Administrative document management
+
+## 📁 Project Structure
+
+```
+kms/
+├── app/
+│   ├── Filament/           # FilamentPHP admin panel
+│   │   ├── Resources/      # CRUD resources
+│   │   ├── Widgets/        # Dashboard widgets
+│   │   └── Pages/          # Custom pages
+│   ├── Models/             # Eloquent models
+│   ├── Services/           # Business logic
+│   └── Traits/             # Reusable traits
+├── database/
+│   ├── migrations/         # Database migrations
+│   └── seeders/           # Database seeders
+├── docs/                  # Documentation
+├── resources/
+│   └── views/             # Blade templates
+└── routes/                # Application routes
+```
+
+## 🔧 Configuration
+
+### Key Configuration Files
+- `.env` - Environment variables
+- `config/filament.php` - FilamentPHP configuration
+- `config/auth.php` - Authentication settings
+- `config/filesystems.php` - File storage settings
+
+### Important Environment Variables
+```env
+APP_NAME="Knowledge Management System"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kms_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+FILESYSTEM_DISK=local
+```
+
+## 🧪 Testing
+
+Run the test suite using Pest:
+```bash
+php artisan test
+```
+
+## 📚 Documentation
+
+- [Complete KMS Documentation](docs/KMS_Documentation.md)
+- [Forum Thread Statistics](docs/forum-thread-statistics.md)
+- [Student Import/Export Guide](docs/student-import-export.md)
+- [Recommendation System](docs/RECOMMENDATION_SYSTEM.md)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the [documentation](docs/)
+- Contact the development team
+
+## 🙏 Acknowledgments
+
+- [Laravel](https://laravel.com) - The PHP framework
+- [FilamentPHP](https://filamentphp.com) - The admin panel
+- [Spatie Laravel Permission](https://github.com/spatie/laravel-permission) - Role and permission management
+- [Kirschbaum Commentions](https://github.com/kirschbaum-development/commentions) - Commenting system
+
+---
+
+<p align="center">Built with ❤️ for academic institutions</p>
