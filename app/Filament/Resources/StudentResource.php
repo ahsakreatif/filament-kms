@@ -166,7 +166,9 @@ class StudentResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable()
-                    ->label('Student Name'),
+                    ->label('Student Name')
+                    ->url(fn ($record) => route('filament.admin.resources.users.view', ['record' => $record->user_id]))
+                    ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('student_id')
                     ->searchable()
                     ->sortable()

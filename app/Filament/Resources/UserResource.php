@@ -127,8 +127,7 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('primaryType.display_name')
                     ->label('Primary Type')
                     ->badge()
-                    ->color('primary')
-                    ->searchable(),
+                    ->color('primary'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
