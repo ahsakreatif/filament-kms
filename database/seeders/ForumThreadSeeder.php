@@ -8,6 +8,9 @@ use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\UserTagPreference;
+use App\Models\ForumThreadLike;
+use App\Models\ForumThreadView;
+use App\Services\RecommendationService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -187,7 +190,8 @@ class ForumThreadSeeder extends Seeder
         $topics = ForumTopic::all();
         $categories = Category::all();
 
-        // Create forum threads
+        // Create forum threads (without random stats initially)
+        $createdThreads = collect();
         foreach ($threadTitles as $index => $title) {
             $thread = ForumThread::create([
                 'title' => $title,
@@ -195,68 +199,29 @@ class ForumThreadSeeder extends Seeder
                 'forum_topic_id' => $topics->random()->id,
                 'category_id' => $categories->random()->id,
                 'user_id' => $users->random()->id,
-                'likes_count' => rand(0, 50),
-                'views_count' => rand(0, 200),
-                'unique_views_count' => rand(0, 100),
+                'likes_count' => 0,
+                'views_count' => 0,
+                'unique_views_count' => 0,
             ]);
 
             // Attach 1-4 random tags to each thread
             $threadTags = $tags->random(rand(1, 4));
             $thread->tags()->syncWithoutDetaching($threadTags);
-
-            // Create some user interactions for recommendation system
-            if (rand(1, 3) === 1) {
-                $randomUsers = $users->random(rand(1, 5));
-                foreach ($randomUsers as $user) {
-                    // Create user preferences based on thread tags
-                    foreach ($threadTags as $tag) {
-                        UserTagPreference::updateOrCreate(
-                            [
-                                'user_id' => $user->id,
-                                'tag_id' => $tag->id,
-                            ],
-                            [
-                                'like_score' => rand(5, 20),
-                                'view_score' => rand(10, 50),
-                                'total_score' => rand(20, 100),
-                                'last_interaction_at' => now()->subDays(rand(0, 30)),
-                            ]
-                        );
-                    }
-                }
-            }
+            
+            $createdThreads->push($thread);
         }
 
         // Create some popular threads
-        ForumThread::factory()
+        $popularThreads = ForumThread::factory()
             ->count(10)
             ->popular()
             ->create()
-            ->each(function ($thread) use ($tags, $users) {
+            ->each(function ($thread) use ($tags) {
                 $thread->tags()->syncWithoutDetaching($tags->random(rand(1, 3)));
-
-                // Create user preferences for popular threads
-                $randomUsers = $users->random(rand(3, 8));
-                foreach ($randomUsers as $user) {
-                    foreach ($thread->tags as $tag) {
-                        UserTagPreference::updateOrCreate(
-                            [
-                                'user_id' => $user->id,
-                                'tag_id' => $tag->id,
-                            ],
-                            [
-                                'like_score' => rand(15, 40),
-                                'view_score' => rand(20, 80),
-                                'total_score' => rand(50, 150),
-                                'last_interaction_at' => now()->subDays(rand(0, 7)),
-                            ]
-                        );
-                    }
-                }
             });
 
         // Create some fresh threads
-        ForumThread::factory()
+        $freshThreads = ForumThread::factory()
             ->count(15)
             ->fresh()
             ->create()
@@ -265,35 +230,72 @@ class ForumThreadSeeder extends Seeder
             });
 
         // Create some controversial threads
-        ForumThread::factory()
+        $controversialThreads = ForumThread::factory()
             ->count(5)
             ->controversial()
             ->create()
-            ->each(function ($thread) use ($tags, $users) {
+            ->each(function ($thread) use ($tags) {
                 $thread->tags()->syncWithoutDetaching($tags->random(rand(1, 4)));
-
-                // Create mixed user preferences for controversial threads
-                $randomUsers = $users->random(rand(5, 10));
-                foreach ($randomUsers as $user) {
-                    foreach ($thread->tags as $tag) {
-                        UserTagPreference::updateOrCreate(
-                            [
-                                'user_id' => $user->id,
-                                'tag_id' => $tag->id,
-                            ],
-                            [
-                                'like_score' => rand(0, 10),
-                                'view_score' => rand(30, 100),
-                                'total_score' => rand(30, 120),
-                                'last_interaction_at' => now()->subDays(rand(0, 14)),
-                            ]
-                        );
-                    }
-                }
             });
+
+        // Collect all threads for interaction generation
+        $allThreads = $createdThreads
+            ->concat($popularThreads)
+            ->concat($freshThreads)
+            ->concat($controversialThreads);
+
+        $this->command->info('Generating forum thread interactions...');
+
+        // Generate realistic likes and views using factories
+        $recommendationService = app(RecommendationService::class);
+        
+        foreach ($allThreads as $thread) {
+            // Generate views (more views than likes, as expected)
+            $viewCount = rand(5, 150);
+            $viewUsers = $users->random(min($viewCount, $users->count()));
+            
+            foreach ($viewUsers as $user) {
+                // Create view record
+                ForumThreadView::factory()->create([
+                    'forum_thread_id' => $thread->id,
+                    'user_id' => $user->id,
+                    'viewed_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ]);
+                
+                // Use recommendation service to update preferences
+                $recommendationService->recordView($user, $thread);
+            }
+
+            // Generate likes (subset of viewers typically like)
+            $likeCount = rand(0, min(intval($viewCount * 0.3), 50)); // Max 30% of viewers like
+            if ($likeCount > 0) {
+                $likeUsers = $viewUsers->random(min($likeCount, $viewUsers->count()));
+                
+                foreach ($likeUsers as $user) {
+                    // Create like record
+                    ForumThreadLike::factory()->create([
+                        'forum_thread_id' => $thread->id,
+                        'user_id' => $user->id,
+                        'liked_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                    ]);
+                    
+                    // Use recommendation service to update preferences
+                    $recommendationService->recordLike($user, $thread);
+                }
+            }
+
+            // Update thread counts based on actual records
+            $thread->update([
+                'likes_count' => $thread->real_likes_count,
+                'views_count' => $thread->real_views_count,
+                'unique_views_count' => $thread->real_unique_views_count,
+            ]);
+        }
 
         $this->command->info('Forum threads seeded successfully!');
         $this->command->info('Created ' . ForumThread::count() . ' forum threads');
+        $this->command->info('Created ' . ForumThreadLike::count() . ' forum thread likes');
+        $this->command->info('Created ' . ForumThreadView::count() . ' forum thread views');
         $this->command->info('Created ' . UserTagPreference::count() . ' user tag preferences');
     }
 }
