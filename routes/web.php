@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-Route::get('/', function () {
-    return redirect()->route('filament.admin.pages.dashboard');
-});
+// use Illuminate\Support\Facades\Route;
+// use Filament\Facades\Filament;
+/* Route::get('/', function () {
+    return redirect(Filament::getUrl());
+}); */
