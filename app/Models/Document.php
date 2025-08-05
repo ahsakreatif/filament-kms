@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\HasDocumentStats;
 
 class Document extends Model
 {
+    use HasDocumentStats;
     protected $fillable = [
         'title',
         'slug',
@@ -29,8 +31,9 @@ class Document extends Model
         'language',
         'is_public',
         'is_featured',
-        'download_count',
+        'downloads_count',
         'view_count',
+        'favorites_count',
         'status',
         'approved_by',
         'approved_at',
@@ -69,5 +72,15 @@ class Document extends Model
     public function forumThreads(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(ForumThread::class, 'document_forum_thread');
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(DocumentFavorite::class);
+    }
+
+    public function favoritedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'document_favorites');
     }
 }

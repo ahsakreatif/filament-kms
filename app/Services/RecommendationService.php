@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\User;
 use App\Models\ForumThread;
+use App\Models\Document;
 use App\Models\UserTagPreference;
 use App\Models\Tag;
 use Illuminate\Support\Facades\DB;
@@ -27,17 +28,33 @@ class RecommendationService
     /**
      * Update user preferences when they view a forum thread
      */
-    public function recordView(User $user, ForumThread $forumThread): void
+    public function recordView(User $user, $model): void
     {
-        $this->updateUserPreferences($user, $forumThread, self::VIEW_POINTS, 'view');
+        $this->updateUserPreferences($user, $model, self::VIEW_POINTS, 'view');
+    }
+
+    /**
+     * Update user preferences when they download a document
+     */
+    public function recordDownload(User $user, Document $document): void
+    {
+        $this->updateUserPreferences($user, $document, self::VIEW_POINTS, 'view');
+    }
+
+    /**
+     * Update user preferences when they favorite a document
+     */
+    public function recordFavorite(User $user, Document $document): void
+    {
+        $this->updateUserPreferences($user, $document, self::LIKE_POINTS, 'like');
     }
 
     /**
      * Update user preferences based on interaction
      */
-    private function updateUserPreferences(User $user, ForumThread $forumThread, int $points, string $interactionType): void
+    private function updateUserPreferences(User $user, $model, int $points, string $interactionType): void
     {
-        $tags = $forumThread->tags;
+        $tags = $model->tags;
 
         if ($tags->isEmpty()) {
             return;
@@ -130,6 +147,53 @@ class RecommendationService
         }
 
         return $recommendedThreads;
+    }
+
+    /**
+     * Get recommended documents for a user
+     */
+    public function getRecommendedDocuments(User $user, int $limit = 10): Collection
+    {
+        // Get user's top tag preferences
+        $topPreferences = UserTagPreference::where('user_id', $user->id)
+            ->orderBy('total_score', 'desc')
+            ->limit(5)
+            ->pluck('tag_id');
+
+        if ($topPreferences->isEmpty()) {
+            // If no preferences, return recent popular documents
+            return Document::with(['tags', 'category', 'uploadedBy'])
+                ->orderBy('favorites_count', 'desc')
+                ->orderBy('downloads_count', 'desc')
+                ->limit($limit)
+                ->get();
+        }
+
+        // Get documents with user's preferred tags
+        $recommendedDocuments = Document::with(['tags', 'category', 'uploadedBy'])
+            ->whereHas('tags', function ($query) use ($topPreferences) {
+                $query->whereIn('tags.id', $topPreferences);
+            })
+            ->where('uploaded_by', '!=', $user->id) // Exclude user's own documents
+            ->orderBy('favorites_count', 'desc')
+            ->orderBy('downloads_count', 'desc')
+            ->limit($limit)
+            ->get();
+
+        // If not enough documents, add some popular documents
+        if ($recommendedDocuments->count() < $limit) {
+            $additionalDocuments = Document::with(['tags', 'category', 'uploadedBy'])
+                ->whereNotIn('id', $recommendedDocuments->pluck('id'))
+                ->where('uploaded_by', '!=', $user->id)
+                ->orderBy('favorites_count', 'desc')
+                ->orderBy('downloads_count', 'desc')
+                ->limit($limit - $recommendedDocuments->count())
+                ->get();
+
+            $recommendedDocuments = $recommendedDocuments->merge($additionalDocuments);
+        }
+
+        return $recommendedDocuments;
     }
 
     /**

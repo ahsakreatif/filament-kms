@@ -6,22 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class DocumentView extends Model
+class DocumentFavorite extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'document_id',
         'user_id',
-        'ip_address',
-        'user_agent',
-        'viewed_at',
+        'favorited_at',
     ];
 
     public $timestamps = false;
 
     protected $casts = [
-        'viewed_at' => 'datetime',
+        'favorited_at' => 'datetime',
     ];
 
     public function document(): BelongsTo

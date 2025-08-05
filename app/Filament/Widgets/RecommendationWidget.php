@@ -21,6 +21,14 @@ class RecommendationWidget extends Widget
         return $recommendationService->getRecommendedThreads($user, 5);
     }
 
+    public function getRecommendedDocuments()
+    {
+        $user = Auth::user();
+        $recommendationService = app(RecommendationService::class);
+
+        return $recommendationService->getRecommendedDocuments($user, 5);
+    }
+
     public function getUserTopTags()
     {
         $user = Auth::user();

@@ -14,6 +14,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -150,6 +152,126 @@ class DocumentResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\Section::make('Basic Information')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('title')
+                            ->label('Document Title')
+                            ->size('lg')
+                            ->weight('bold')
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('description')
+                            ->label('Description')
+                            ->markdown()
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('abstract')
+                            ->label('Abstract')
+                            ->markdown()
+                            ->columnSpanFull(),
+                        Infolists\Components\TextEntry::make('slug')
+                            ->label('Slug'),
+                    ])
+                    ->columns(2),
+
+                Infolists\Components\Section::make('File Information')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('file_name')
+                            ->label('File Name'),
+                        Infolists\Components\TextEntry::make('file_size')
+                            ->label('File Size')
+                            ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : 'N/A'),
+                        Infolists\Components\TextEntry::make('file_type')
+                            ->label('File Type')
+                            ->formatStateUsing(fn ($state) => strtoupper($state)),
+                        Infolists\Components\TextEntry::make('mime_type')
+                            ->label('MIME Type'),
+                        Infolists\Components\TextEntry::make('file_path')
+                            ->label('File Path')
+                            ->url(fn ($state) => $state ? url('storage/' . $state) : null)
+                            ->openUrlInNewTab(),
+                    ])
+                    ->columns(2),
+
+                Infolists\Components\Section::make('Classification')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('category.name')
+                            ->label('Category'),
+                        Infolists\Components\TextEntry::make('tags.name')
+                            ->label('Tags')
+                            ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : $state),
+                        Infolists\Components\TextEntry::make('status')
+                            ->label('Status')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'draft' => 'gray',
+                                'published' => 'success',
+                                'archived' => 'warning',
+                                'flagged' => 'danger',
+                            }),
+                    ])
+                    ->columns(3),
+
+                Infolists\Components\Section::make('Publication Details')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('author')
+                            ->label('Author'),
+                        Infolists\Components\TextEntry::make('keywords')
+                            ->label('Keywords'),
+                        Infolists\Components\TextEntry::make('publication_year')
+                            ->label('Publication Year'),
+                        Infolists\Components\TextEntry::make('doi')
+                            ->label('DOI'),
+                        Infolists\Components\TextEntry::make('isbn')
+                            ->label('ISBN'),
+                        Infolists\Components\TextEntry::make('language')
+                            ->label('Language'),
+                    ])
+                    ->columns(2),
+
+                Infolists\Components\Section::make('Settings & Statistics')
+                    ->schema([
+                        Infolists\Components\IconEntry::make('is_public')
+                            ->label('Public Document')
+                            ->boolean()
+                            ->trueIcon('heroicon-o-eye')
+                            ->falseIcon('heroicon-o-eye-slash'),
+                        Infolists\Components\IconEntry::make('is_featured')
+                            ->label('Featured Document')
+                            ->boolean()
+                            ->trueIcon('heroicon-o-star')
+                            ->falseIcon('heroicon-o-star'),
+                        Infolists\Components\TextEntry::make('downloads_count')
+                            ->label('Downloads')
+                            ->icon('heroicon-o-arrow-down-tray'),
+                        Infolists\Components\TextEntry::make('favorites_count')
+                            ->label('Favorites')
+                            ->icon('heroicon-o-heart'),
+                    ])
+                    ->columns(2),
+
+                Infolists\Components\Section::make('User Information')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('uploadedBy.name')
+                            ->label('Uploaded By'),
+                        Infolists\Components\TextEntry::make('approvedBy.name')
+                            ->label('Approved By'),
+                        Infolists\Components\TextEntry::make('created_at')
+                            ->label('Created At')
+                            ->dateTime(),
+                        Infolists\Components\TextEntry::make('updated_at')
+                            ->label('Last Updated')
+                            ->dateTime(),
+                        Infolists\Components\TextEntry::make('approved_at')
+                            ->label('Approved At')
+                            ->dateTime(),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -179,9 +301,13 @@ class DocumentResource extends Resource
                 Tables\Columns\IconColumn::make('is_featured')
                     ->boolean()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('download_count')
+                Tables\Columns\TextColumn::make('downloads_count')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('view_count')
+                Tables\Columns\TextColumn::make('favorites_count')
+                    ->icon('heroicon-o-heart')
+                    ->color('danger')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -228,6 +354,7 @@ class DocumentResource extends Resource
                     }),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('approve')
                     ->icon('heroicon-o-check-circle')
@@ -266,6 +393,7 @@ class DocumentResource extends Resource
         return [
             'index' => Pages\ListDocuments::route('/'),
             'create' => Pages\CreateDocument::route('/create'),
+            'view' => Pages\ViewDocument::route('/{record}'),
             'edit' => Pages\EditDocument::route('/{record}/edit'),
         ];
     }

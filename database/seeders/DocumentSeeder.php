@@ -8,6 +8,10 @@ use App\Models\Document;
 use App\Models\Category;
 use App\Models\Tag;
 use App\Models\User;
+use App\Models\DocumentDownload;
+use App\Models\DocumentView;
+use App\Models\DocumentFavorite;
+use App\Services\RecommendationService;
 use Illuminate\Support\Str;
 
 class DocumentSeeder extends Seeder
@@ -218,8 +222,9 @@ class DocumentSeeder extends Seeder
                 'language' => 'en',
                 'is_public' => true,
                 'is_featured' => rand(0, 1),
-                'download_count' => rand(0, 50),
-                'view_count' => rand(10, 200),
+                'downloads_count' => 0,
+                'view_count' => 0,
+                'favorites_count' => 0,
                 'status' => 'published',
                 'approved_by' => $users->random()->id,
                 'approved_at' => now(),
@@ -245,6 +250,83 @@ class DocumentSeeder extends Seeder
             }
         }
 
+        // Get all created documents for interaction generation
+        $allDocuments = Document::all();
+
+        $this->command->info('Generating document interactions...');
+
+        // Generate realistic downloads, views, and favorites
+        $recommendationService = app(RecommendationService::class);
+
+        foreach ($allDocuments as $document) {
+            // Generate views (more views than downloads, as expected)
+            $viewCount = rand(10, 200);
+            $viewUsers = $users->random(min($viewCount, $users->count()));
+
+            foreach ($viewUsers as $user) {
+                // Create view record
+                DocumentView::create([
+                    'document_id' => $document->id,
+                    'user_id' => $user->id,
+                    'ip_address' => fake()->ipv4(),
+                    'user_agent' => fake()->userAgent(),
+                    'viewed_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                ]);
+
+                // Use recommendation service to update preferences
+                $recommendationService->recordView($user, $document);
+            }
+
+            // Generate downloads (subset of viewers typically download)
+            $downloadCount = rand(0, min(intval($viewCount * 0.4), 80)); // Max 40% of viewers download
+            if ($downloadCount > 0) {
+                $downloadUsers = $viewUsers->random(min($downloadCount, $viewUsers->count()));
+
+                foreach ($downloadUsers as $user) {
+                    // Create download record
+                    DocumentDownload::create([
+                        'document_id' => $document->id,
+                        'user_id' => $user->id,
+                        'ip_address' => fake()->ipv4(),
+                        'user_agent' => fake()->userAgent(),
+                        'downloaded_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                    ]);
+
+                    // Use recommendation service to update preferences
+                    $recommendationService->recordDownload($user, $document);
+                }
+            }
+
+            // Generate favorites (subset of viewers typically favorite)
+            $favoriteCount = rand(0, min(intval($viewCount * 0.2), 30)); // Max 20% of viewers favorite
+            if ($favoriteCount > 0) {
+                $favoriteUsers = $viewUsers->random(min($favoriteCount, $viewUsers->count()));
+
+                foreach ($favoriteUsers as $user) {
+                    // Create favorite record
+                    DocumentFavorite::create([
+                        'document_id' => $document->id,
+                        'user_id' => $user->id,
+                        'favorited_at' => fake()->dateTimeBetween('-30 days', 'now'),
+                    ]);
+
+                    // Use recommendation service to update preferences
+                    $recommendationService->recordFavorite($user, $document);
+                }
+            }
+
+            // Update document counts based on actual records
+            $document->update([
+                'view_count' => $document->real_views_count,
+                'downloads_count' => $document->real_downloads_count,
+                'favorites_count' => $document->real_favorites_count,
+            ]);
+        }
+
         $this->command->info('Documents seeded successfully!');
+        $this->command->info('Created ' . Document::count() . ' documents');
+        $this->command->info('Created ' . DocumentView::count() . ' document views');
+        $this->command->info('Created ' . DocumentDownload::count() . ' document downloads');
+        $this->command->info('Created ' . DocumentFavorite::count() . ' document favorites');
     }
 }

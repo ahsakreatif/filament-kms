@@ -32,7 +32,7 @@ return new class extends Migration
             $table->string('language', 10)->default('id');
             $table->boolean('is_public')->default(true);
             $table->boolean('is_featured')->default(false);
-            $table->integer('download_count')->default(0);
+            $table->integer('downloads_count')->default(0);
             $table->integer('view_count')->default(0);
             $table->enum('status', ['draft', 'published', 'archived', 'flagged'])->default('published');
             $table->unsignedBigInteger('approved_by')->nullable();
