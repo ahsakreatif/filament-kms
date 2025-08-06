@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ForumThread;
+use App\Models\UserTagPreference;
 use Illuminate\Support\Facades\DB;
 
 class ForumThreadStatsService
@@ -98,5 +99,16 @@ class ForumThreadStatsService
             ->get();
 
         return $stats->toArray();
+    }
+
+    /**
+     * Get most active user
+     */
+    public function getMostActiveUser(): \Illuminate\Database\Eloquent\Model | null
+    {
+        return UserTagPreference::select(DB::raw('sum(total_score) as total_score'), 'user_id')
+            ->groupBy('user_id')
+            ->orderBy('total_score', 'desc')
+            ->first();
     }
 }
