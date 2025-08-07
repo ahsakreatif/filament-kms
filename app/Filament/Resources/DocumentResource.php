@@ -18,8 +18,9 @@ use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 
-class DocumentResource extends Resource
+class DocumentResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Document::class;
 
@@ -63,6 +64,26 @@ class DocumentResource extends Resource
             'Category' => $record->category?->name,
             'Uploader' => $record->uploadedBy?->name,
             'Tags' => $record->tags->pluck('name')->implode(', '),
+        ];
+    }
+
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'restore',
+            'restore_any',
+            'replicate',
+            'reorder',
+            'delete',
+            'delete_any',
+            'force_delete',
+            'force_delete_any',
+            'lock',
+            'publish'
         ];
     }
 
@@ -148,7 +169,8 @@ class DocumentResource extends Resource
                         Forms\Components\Toggle::make('is_featured')
                             ->label('Featured Document')
                             ->default(false),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->visible(fn () => auth()->user()->can('publish')),
             ]);
     }
 
@@ -355,7 +377,16 @@ class DocumentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                                                Tables\Actions\EditAction::make()
+                    ->visible(function (Document $record): bool {
+                        $user = Filament::auth()->user();
+                        return $user && $record->uploaded_by === $user->id;
+                    }),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(function (Document $record): bool {
+                        $user = Filament::auth()->user();
+                        return $user && $record->uploaded_by === $user->id;
+                    }),
                 Tables\Actions\Action::make('approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -375,7 +406,11 @@ class DocumentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(function (): bool {
+                            $user = Filament::auth()->user();
+                            return $user && $user->id === 1; // Only super admin (ID 1) can bulk delete
+                        }),
                 ]),
             ]);
     }

@@ -20,6 +20,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Pages\Login;
 use Filament\Navigation\NavigationGroup;
+use Filament\Facades\Filament;
 
 class AdminPanelProvider extends PanelProvider
 {

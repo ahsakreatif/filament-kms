@@ -7,8 +7,10 @@ use App\Models\StudentProfile;
 use App\Models\StudyProgram;
 use App\Models\Faculty;
 use App\Models\LecturerProfile;
+use App\Models\UserType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Enums\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -38,6 +40,9 @@ class StudentFactory extends Factory
     {
         $user = User::factory()->create();
 
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
+
         StudentProfile::factory()
             ->forUser($user)
             ->create($profileAttributes);
@@ -51,6 +56,9 @@ class StudentFactory extends Factory
     public function withStudyProgram(StudyProgram $studyProgram, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
 
         StudentProfile::factory()
             ->forUser($user)
@@ -67,6 +75,9 @@ class StudentFactory extends Factory
     {
         $user = User::factory()->create();
 
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
+
         StudentProfile::factory()
             ->forUser($user)
             ->forFaculty($faculty)
@@ -81,6 +92,9 @@ class StudentFactory extends Factory
     public function active(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
 
         StudentProfile::factory()
             ->forUser($user)
@@ -97,6 +111,9 @@ class StudentFactory extends Factory
     {
         $user = User::factory()->create();
 
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
+
         StudentProfile::factory()
             ->forUser($user)
             ->graduated()
@@ -111,6 +128,9 @@ class StudentFactory extends Factory
     public function withAdvisor(LecturerProfile $advisor, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
 
         StudentProfile::factory()
             ->forUser($user)
@@ -127,6 +147,9 @@ class StudentFactory extends Factory
     {
         $user = User::factory()->create();
 
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
+
         StudentProfile::factory()
             ->forUser($user)
             ->enrolledIn($year)
@@ -142,6 +165,9 @@ class StudentFactory extends Factory
     {
         $user = User::factory()->create();
 
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
+
         StudentProfile::factory()
             ->forUser($user)
             ->inSemester($semester)
@@ -156,6 +182,9 @@ class StudentFactory extends Factory
     public function withGpa(float $minGpa, float $maxGpa, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        // Assign student role
+        $user->assignRole(Role::STUDENT);
 
         StudentProfile::factory()
             ->forUser($user)

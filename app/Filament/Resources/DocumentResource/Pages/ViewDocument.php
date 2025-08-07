@@ -14,7 +14,11 @@ class ViewDocument extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make(),
+            Actions\EditAction::make()
+                ->visible(function (): bool {
+                    $user = Filament::auth()->user();
+                    return $user && $this->record->uploaded_by === $user->id;
+                }),
             Actions\Action::make('download')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->label('Download Document')

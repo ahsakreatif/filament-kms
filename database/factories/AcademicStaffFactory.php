@@ -7,6 +7,7 @@ use App\Models\AcademicStaffProfile;
 use App\Models\Faculty;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Enums\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -36,6 +37,8 @@ class AcademicStaffFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::ACADEMIC_STAFF);
+
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->create($profileAttributes);
@@ -49,6 +52,8 @@ class AcademicStaffFactory extends Factory
     public function withFaculty(Faculty $faculty, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::ACADEMIC_STAFF);
 
         AcademicStaffProfile::factory()
             ->forUser($user)
@@ -65,6 +70,8 @@ class AcademicStaffFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::ACADEMIC_STAFF);
+
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->active()
@@ -79,6 +86,8 @@ class AcademicStaffFactory extends Factory
     public function dean(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::ACADEMIC_STAFF);
 
         AcademicStaffProfile::factory()
             ->forUser($user)
@@ -95,6 +104,8 @@ class AcademicStaffFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::ACADEMIC_STAFF);
+
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->associateDean()
@@ -109,6 +120,8 @@ class AcademicStaffFactory extends Factory
     public function headOfDepartment(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::ACADEMIC_STAFF);
 
         AcademicStaffProfile::factory()
             ->forUser($user)
@@ -125,6 +138,8 @@ class AcademicStaffFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::ACADEMIC_STAFF);
+
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->programCoordinator()
@@ -139,6 +154,8 @@ class AcademicStaffFactory extends Factory
     public function academicAdvisor(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::ACADEMIC_STAFF);
 
         AcademicStaffProfile::factory()
             ->forUser($user)
@@ -155,6 +172,8 @@ class AcademicStaffFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::ACADEMIC_STAFF);
+
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->withPosition($position)
@@ -169,6 +188,8 @@ class AcademicStaffFactory extends Factory
     public function withPositionAndFaculty(string $position, Faculty $faculty, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::ACADEMIC_STAFF);
 
         AcademicStaffProfile::factory()
             ->forUser($user)
@@ -185,6 +206,8 @@ class AcademicStaffFactory extends Factory
     public function retired(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::ACADEMIC_STAFF);
 
         AcademicStaffProfile::factory()
             ->forUser($user)

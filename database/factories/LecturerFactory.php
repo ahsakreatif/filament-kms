@@ -7,6 +7,7 @@ use App\Models\LecturerProfile;
 use App\Models\Faculty;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Enums\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -36,6 +37,8 @@ class LecturerFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::LECTURER);
+
         LecturerProfile::factory()
             ->forUser($user)
             ->create($profileAttributes);
@@ -49,6 +52,8 @@ class LecturerFactory extends Factory
     public function withFaculty(Faculty $faculty, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::LECTURER);
 
         LecturerProfile::factory()
             ->forUser($user)
@@ -65,6 +70,8 @@ class LecturerFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::LECTURER);
+
         LecturerProfile::factory()
             ->forUser($user)
             ->active()
@@ -79,6 +86,8 @@ class LecturerFactory extends Factory
     public function professor(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::LECTURER);
 
         LecturerProfile::factory()
             ->forUser($user)
@@ -95,6 +104,8 @@ class LecturerFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::LECTURER);
+
         LecturerProfile::factory()
             ->forUser($user)
             ->associateProfessor()
@@ -109,6 +120,8 @@ class LecturerFactory extends Factory
     public function withRank(string $rank, array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::LECTURER);
 
         LecturerProfile::factory()
             ->forUser($user)
@@ -125,6 +138,8 @@ class LecturerFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::LECTURER);
+
         LecturerProfile::factory()
             ->forUser($user)
             ->withSpecialization($specialization)
@@ -140,6 +155,8 @@ class LecturerFactory extends Factory
     {
         $user = User::factory()->create();
 
+        $user->assignRole(Role::LECTURER);
+
         LecturerProfile::factory()
             ->forUser($user)
             ->withQualification($qualification)
@@ -154,6 +171,8 @@ class LecturerFactory extends Factory
     public function retired(array $profileAttributes = []): User
     {
         $user = User::factory()->create();
+
+        $user->assignRole(Role::LECTURER);
 
         LecturerProfile::factory()
             ->forUser($user)

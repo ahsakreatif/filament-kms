@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Collection;
 use Filament\Forms\Components\Actions\Action;
+use Filament\Facades\Filament;
 
 class UserResource extends Resource
 {

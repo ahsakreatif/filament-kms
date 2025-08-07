@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             DocumentSeeder::class,
             ForumTopicSeeder::class,
             ForumThreadSeeder::class,
+            PermissionSeeder::class,
         ]);
     }
 }
