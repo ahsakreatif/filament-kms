@@ -33,6 +33,11 @@ class StudyProgramResource extends Resource
                     ->required()
                     ->maxLength(20),
                 Forms\Components\Select::make('faculty_id')
+                    ->relationship('faculty', 'name')
+                    ->required(),
+                Forms\Components\Toggle::make('is_active')
+                    ->required()
+                    ->default(true),
             ]);
     }
 
