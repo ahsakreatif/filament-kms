@@ -45,17 +45,12 @@ class ForumViewThread extends ViewRecord
                         ->title($message)
                         ->success()
                         ->send();
-                })
-                ->requiresConfirmation()
-                ->modalHeading(fn (): string => $this->record->isLikedByCurrentUser() ? 'Unlike Thread' : 'Like Thread')
-                ->modalDescription(fn (): string => $this->record->isLikedByCurrentUser()
-                    ? 'Are you sure you want to unlike this thread?'
-                    : 'Are you sure you want to like this thread?'),
-            Action::make('view_stats')
+                }),
+            /* Action::make('view_stats')
                 ->label('View Statistics')
                 ->icon('heroicon-o-chart-bar')
                 ->color('success')
-                ->url(fn () => ForumThreadResource::getUrl('stats', ['record' => $this->record])),
+                ->url(fn () => ForumThreadResource::getUrl('stats', ['record' => $this->record])), */
         ];
     }
 

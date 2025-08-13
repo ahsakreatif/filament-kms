@@ -19,12 +19,12 @@
                         <span>{{ $this->record->created_at->format('M j, Y \a\t g:i A') }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <x-heroicon-o-tag class="w-5 h-5" />
+                        <x-icon :name="$this->record->topic->icon ?? 'heroicon-o-tag'" class="w-5 h-5" />
                         <span>{{ $this->record->topic->name }}</span>
                     </div>
                     @if($this->record->category)
                     <div class="flex items-center gap-2">
-                        <x-heroicon-o-folder class="w-5 h-5" />
+                        <x-icon :name="$this->record->category->icon ?? 'heroicon-o-folder'" class="w-5 h-5" />
                         <span>{{ $this->record->category->name }}</span>
                     </div>
                     @endif

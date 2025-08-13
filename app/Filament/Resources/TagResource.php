@@ -35,9 +35,9 @@ class TagResource extends Resource
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description'),
                 Forms\Components\ColorPicker::make('color'),
-                Forms\Components\TextInput::make('usage_count')
+                /* Forms\Components\TextInput::make('usage_count')
                     ->numeric()
-                    ->default(0),
+                    ->default(0), */
             ]);
     }
 

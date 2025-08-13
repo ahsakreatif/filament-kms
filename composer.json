@@ -9,6 +9,7 @@
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^3.3",
         "filament/filament": "^3.3",
+        "guava/filament-icon-picker": "^2.0",
         "joaopaulolndev/filament-edit-profile": "^1.0",
         "kirschbaum-development/commentions": "^0.6.4",
         "laravel/framework": "^12.0",

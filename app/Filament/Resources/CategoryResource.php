@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Guava\FilamentIconPicker\Forms\IconPicker;
 
 class CategoryResource extends Resource
 {
@@ -40,8 +41,8 @@ class CategoryResource extends Resource
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\TextInput::make('icon')
-                    ->maxLength(100),
+                IconPicker::make('icon')
+                    ->columns(3),
                 Forms\Components\ColorPicker::make('color'),
                 Forms\Components\Toggle::make('is_active')
                     ->label('Active')
