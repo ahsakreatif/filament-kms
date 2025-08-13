@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\User;
 use App\Models\LecturerProfile;
 use App\Models\Faculty;
+use App\Models\UserType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Enums\Role;
@@ -30,20 +31,32 @@ class LecturerFactory extends Factory
         ];
     }
 
-    /**
-     * Create a lecturer with both user and profile.
-     */
-    public function withProfile(array $profileAttributes = []): User
+    public function basic(): User
     {
         $user = User::factory()->create();
 
         $user->assignRole(Role::LECTURER);
 
+        return $user;
+    }
+
+    /**
+     * Create a lecturer with both user and profile.
+     */
+    public function withProfile(array $profileAttributes = []): User
+    {
+        $user = $this->basic();
+
         LecturerProfile::factory()
             ->forUser($user)
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -51,16 +64,19 @@ class LecturerFactory extends Factory
      */
     public function withFaculty(Faculty $faculty, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->forFaculty($faculty)
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -68,16 +84,19 @@ class LecturerFactory extends Factory
      */
     public function active(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->active()
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -85,16 +104,19 @@ class LecturerFactory extends Factory
      */
     public function professor(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->professor()
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -102,16 +124,19 @@ class LecturerFactory extends Factory
      */
     public function associateProfessor(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->associateProfessor()
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -119,16 +144,19 @@ class LecturerFactory extends Factory
      */
     public function withRank(string $rank, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->withRank($rank)
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -136,16 +164,19 @@ class LecturerFactory extends Factory
      */
     public function withSpecialization(string $specialization, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->withSpecialization($specialization)
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -153,16 +184,19 @@ class LecturerFactory extends Factory
      */
     public function withQualification(string $qualification, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->withQualification($qualification)
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -170,16 +204,19 @@ class LecturerFactory extends Factory
      */
     public function retired(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::LECTURER);
+        $user = $this->basic();
 
         LecturerProfile::factory()
             ->forUser($user)
             ->retired()
             ->create($profileAttributes);
 
-        return $user->load('lecturerProfile');
+        $user->load('lecturerProfile');
+        $profile = $user->lecturerProfile;
+
+        $user->assignUserType(UserType::where('name', Role::LECTURER->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**

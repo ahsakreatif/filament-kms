@@ -175,10 +175,8 @@ class StudentResource extends Resource
                     ->badge()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('study_program.name')
-                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('faculty.name')
-                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('current_semester')
                     ->sortable()
@@ -191,8 +189,7 @@ class StudentResource extends Resource
                     )
                     ->sortable(),
                 Tables\Columns\TextColumn::make('advisor.name')
-                    ->label('Advisor')
-                    ->searchable(),
+                    ->label('Advisor'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

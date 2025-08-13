@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\User;
 use App\Models\AcademicStaffProfile;
 use App\Models\Faculty;
+use App\Models\UserType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Enums\Role;
@@ -30,20 +31,32 @@ class AcademicStaffFactory extends Factory
         ];
     }
 
-    /**
-     * Create an academic staff with both user and profile.
-     */
-    public function withProfile(array $profileAttributes = []): User
+    public function basic(): User
     {
         $user = User::factory()->create();
 
         $user->assignRole(Role::ACADEMIC_STAFF);
 
+        return $user;
+    }
+
+    /**
+     * Create an academic staff with both user and profile.
+     */
+    public function withProfile(array $profileAttributes = []): User
+    {
+        $user = $this->basic();
+
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -51,16 +64,19 @@ class AcademicStaffFactory extends Factory
      */
     public function withFaculty(Faculty $faculty, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->forFaculty($faculty)
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -68,16 +84,19 @@ class AcademicStaffFactory extends Factory
      */
     public function active(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->active()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -85,16 +104,19 @@ class AcademicStaffFactory extends Factory
      */
     public function dean(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->dean()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -102,16 +124,19 @@ class AcademicStaffFactory extends Factory
      */
     public function associateDean(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->associateDean()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -119,16 +144,19 @@ class AcademicStaffFactory extends Factory
      */
     public function headOfDepartment(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->headOfDepartment()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -136,16 +164,19 @@ class AcademicStaffFactory extends Factory
      */
     public function programCoordinator(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->programCoordinator()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -153,16 +184,19 @@ class AcademicStaffFactory extends Factory
      */
     public function academicAdvisor(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->academicAdvisor()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -170,16 +204,19 @@ class AcademicStaffFactory extends Factory
      */
     public function withPosition(string $position, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->withPosition($position)
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -187,9 +224,7 @@ class AcademicStaffFactory extends Factory
      */
     public function withPositionAndFaculty(string $position, Faculty $faculty, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
@@ -197,7 +232,12 @@ class AcademicStaffFactory extends Factory
             ->forFaculty($faculty)
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -205,16 +245,19 @@ class AcademicStaffFactory extends Factory
      */
     public function retired(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        $user->assignRole(Role::ACADEMIC_STAFF);
+        $user = $this->basic();
 
         AcademicStaffProfile::factory()
             ->forUser($user)
             ->retired()
             ->create($profileAttributes);
 
-        return $user->load('academicStaffProfile');
+        $user->load('academicStaffProfile');
+        $profile = $user->academicStaffProfile;
+
+        $user->assignUserType(UserType::where('name', Role::ACADEMIC_STAFF->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**

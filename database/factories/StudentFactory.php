@@ -33,21 +33,32 @@ class StudentFactory extends Factory
         ];
     }
 
+    public function basic(): User
+    {
+        $user = User::factory()->create();
+
+        $user->assignRole(Role::STUDENT);
+
+        return $user;
+    }
+
     /**
      * Create a student with both user and profile.
      */
     public function withProfile(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -55,17 +66,19 @@ class StudentFactory extends Factory
      */
     public function withStudyProgram(StudyProgram $studyProgram, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->forStudyProgram($studyProgram)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -73,17 +86,19 @@ class StudentFactory extends Factory
      */
     public function withFaculty(Faculty $faculty, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->forFaculty($faculty)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -91,17 +106,19 @@ class StudentFactory extends Factory
      */
     public function active(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->active()
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -109,17 +126,19 @@ class StudentFactory extends Factory
      */
     public function graduated(array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->graduated()
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -127,17 +146,19 @@ class StudentFactory extends Factory
      */
     public function withAdvisor(LecturerProfile $advisor, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->withAdvisor($advisor)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -145,17 +166,19 @@ class StudentFactory extends Factory
      */
     public function enrolledIn(int $year, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->enrolledIn($year)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -163,17 +186,19 @@ class StudentFactory extends Factory
      */
     public function inSemester(int $semester, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->inSemester($semester)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
@@ -181,17 +206,19 @@ class StudentFactory extends Factory
      */
     public function withGpa(float $minGpa, float $maxGpa, array $profileAttributes = []): User
     {
-        $user = User::factory()->create();
-
-        // Assign student role
-        $user->assignRole(Role::STUDENT);
+        $user = $this->basic();
 
         StudentProfile::factory()
             ->forUser($user)
             ->withGpa($minGpa, $maxGpa)
             ->create($profileAttributes);
 
-        return $user->load('studentProfile');
+        $user->load('studentProfile');
+        $profile = $user->studentProfile;
+
+        $user->assignUserType(UserType::where('name', Role::STUDENT->value)->first(), $profile->id, true);
+
+        return $user;
     }
 
     /**
