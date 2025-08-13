@@ -149,7 +149,7 @@ class ForumThreadResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('user.avatar')
+                Tables\Columns\ImageColumn::make('user.avatar_url')
                     ->label('Author')
                     ->circular()
                     ->defaultImageUrl(function ($record) {

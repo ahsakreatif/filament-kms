@@ -155,10 +155,17 @@ class AcademicStaffResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('user.avatar_url')
+                    ->circular()
+                    ->defaultImageUrl(function ($record) {
+                        return 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name);
+                    }),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable()
-                    ->label('Staff Name'),
+                    ->label('Staff Name')
+                    ->url(fn (AcademicStaffProfile $record): string =>
+                        UserResource::getUrl('edit', ['record' => $record->user])),
                 Tables\Columns\TextColumn::make('academic_id')
                     ->searchable()
                     ->sortable()

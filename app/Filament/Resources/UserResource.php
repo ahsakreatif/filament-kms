@@ -45,7 +45,7 @@ class UserResource extends Resource
                         Forms\Components\TextInput::make('phone')
                             ->tel()
                             ->maxLength(20),
-                        Forms\Components\FileUpload::make('avatar')
+                        Forms\Components\FileUpload::make('avatar_url')
                             ->image()
                             ->avatar()
                             ->directory('avatars')
@@ -113,7 +113,7 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('avatar')
+                Tables\Columns\ImageColumn::make('avatar_url')
                     ->circular()
                     ->label('Avatar')
                     ->defaultImageUrl(function ($record) {

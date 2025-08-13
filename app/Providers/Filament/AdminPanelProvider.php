@@ -21,6 +21,10 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Pages\Login;
 use Filament\Navigation\NavigationGroup;
 use Filament\Facades\Filament;
+use Joaopaulolndev\FilamentEditProfile\FilamentEditProfilePlugin;
+use Joaopaulolndev\FilamentEditProfile\Pages\EditProfilePage;
+use Filament\Navigation\MenuItem;
+
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -83,9 +87,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
+                FilamentEditProfilePlugin::make()
+                    ->shouldShowAvatarForm(true)
+                    ->shouldRegisterNavigation(false),
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                MenuItem::make('Edit Profile')
+                    ->label('Edit Profile')
+                    ->url(fn (): string => EditProfilePage::getUrl())
+                    ->icon('heroicon-o-user'),
             ])
             ->sidebarCollapsibleOnDesktop()
             ->path('');

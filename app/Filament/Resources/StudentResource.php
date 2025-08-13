@@ -163,6 +163,11 @@ class StudentResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('user.avatar_url')
+                    ->circular()
+                    ->defaultImageUrl(function ($record) {
+                        return 'https://ui-avatars.com/api/?name=' . urlencode($record->user->name);
+                    }),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable()

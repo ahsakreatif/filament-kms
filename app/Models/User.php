@@ -8,8 +8,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 use Kirschbaum\Commentions\Contracts\Commenter;
+use Filament\Models\Contracts\HasAvatar;
+use Illuminate\Support\Facades\Storage;
 
-class User extends Authenticatable implements Commenter
+class User extends Authenticatable implements Commenter, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles;
@@ -24,7 +26,7 @@ class User extends Authenticatable implements Commenter
         'email',
         'password',
         'phone',
-        'avatar',
+        'avatar_url',
         'is_active',
         'last_login_at',
     ];
@@ -233,5 +235,10 @@ class User extends Authenticatable implements Commenter
     public function forumThreadViews()
     {
         return $this->hasMany(ForumThreadView::class);
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->avatar_url ? Storage::url($this->avatar_url) : null;
     }
 }

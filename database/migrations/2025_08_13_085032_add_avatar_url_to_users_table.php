@@ -12,10 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('phone', 20)->nullable()->after('email');
-            // $table->string('avatar')->nullable()->after('phone');
-            $table->boolean('is_active')->default(true)->after('phone');
-            $table->timestamp('last_login_at')->nullable()->after('is_active');
+            $table->string(config('filament-edit-profile.avatar_column', 'avatar_url'))->nullable();
         });
     }
 
@@ -25,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['phone', 'is_active', 'last_login_at']);
+            $table->dropColumn(config('filament-edit-profile.avatar_column', 'avatar_url'));
         });
     }
 };

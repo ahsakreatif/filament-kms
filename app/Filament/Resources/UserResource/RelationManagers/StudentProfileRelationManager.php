@@ -36,9 +36,11 @@ class StudentProfileRelationManager extends RelationManager
                             ->required()
                             ->maxLength(255)
                             ->label('Study Program'),
-                        Forms\Components\TextInput::make('faculty')
+                        Forms\Components\Select::make('faculty_id')
+                            ->relationship('faculty', 'name')
                             ->required()
-                            ->maxLength(255)
+                            ->searchable()
+                            ->preload()
                             ->label('Faculty'),
                     ])->columns(2),
 
@@ -102,10 +104,8 @@ class StudentProfileRelationManager extends RelationManager
                     ->badge()
                     ->color('primary'),
                 Tables\Columns\TextColumn::make('study_program')
-                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('faculty')
-                    ->searchable()
+                Tables\Columns\TextColumn::make('faculty.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('current_semester')
                     ->sortable()
@@ -139,8 +139,8 @@ class StudentProfileRelationManager extends RelationManager
                         'dropped' => 'Dropped',
                     ])
                     ->label('Status'),
-                Tables\Filters\SelectFilter::make('faculty')
-                    ->options(fn () => \App\Models\StudentProfile::distinct()->pluck('faculty', 'faculty')->toArray())
+                Tables\Filters\SelectFilter::make('faculty_id')
+                    ->options(fn () => \App\Models\Faculty::pluck('name', 'id'))
                     ->label('Faculty'),
             ])
             ->headerActions([
