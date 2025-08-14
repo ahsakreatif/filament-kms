@@ -5,8 +5,6 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\View\View;
-use Filament\Facades\Filament;
-use Filament\Navigation\NavigationItem;
 
 class AppServiceProvider extends ServiceProvider
 {

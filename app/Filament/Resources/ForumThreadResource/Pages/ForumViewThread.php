@@ -3,10 +3,11 @@
 namespace App\Filament\Resources\ForumThreadResource\Pages;
 
 use App\Filament\Resources\ForumThreadResource;
-use App\Models\ForumThread;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Actions\Action;
+use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification;
+use Filament\Facades\Filament;
 
 class ForumViewThread extends ViewRecord
 {
@@ -45,6 +46,34 @@ class ForumViewThread extends ViewRecord
                         ->title($message)
                         ->success()
                         ->send();
+
+                    // send notification to thread owner
+                    $threadOwner = $this->record->user;
+                    $currentUser = Filament::auth()->user();
+                    if ($threadOwner && $currentUser && $threadOwner->getKey() !== $currentUser->getKey() && $isLiked) {
+                        $title = 'Your thread has been liked!';
+                        $body = 'Someone liked your thread "' . $this->record->title . '"';
+                        $threadOwner->notify(
+                            Notification::make()
+                            ->title($title)
+                            ->body($body)
+                            ->actions([
+                                NotificationAction::make('view')
+                                    ->label('View Thread')
+                                    ->url(fn () => ForumThreadResource::getUrl('view', ['record' => $this->record]))
+                                    ->color('primary')
+                                    ->icon('heroicon-o-eye'),
+                            ])
+                            ->icon('heroicon-o-heart')
+                            ->toDatabase(),
+                        );
+                        $threadOwner->notify(
+                            Notification::make()
+                                ->title($title)
+                                ->icon('heroicon-o-heart')
+                                ->toBroadcast(),
+                        );
+                    }
                 }),
             /* Action::make('view_stats')
                 ->label('View Statistics')

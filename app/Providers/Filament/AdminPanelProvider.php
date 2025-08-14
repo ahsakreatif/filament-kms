@@ -100,6 +100,8 @@ class AdminPanelProvider extends PanelProvider
                     ->url(fn (): string => EditProfilePage::getUrl())
                     ->icon('heroicon-o-user'),
             ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('10s')
             ->sidebarCollapsibleOnDesktop()
             ->path('');
     }

@@ -7,6 +7,8 @@ use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Facades\Filament;
 use Filament\Forms;
+use Filament\Notifications\Notification;
+use Filament\Notifications\Actions\Action as NotificationAction;
 
 class ViewDocument extends ViewRecord
 {
@@ -19,6 +21,44 @@ class ViewDocument extends ViewRecord
                 ->visible(function (): bool {
                     $user = Filament::auth()->user();
                     return $user && $this->record->uploaded_by === $user->id;
+                }),
+            Actions\Action::make('favorite')
+                ->icon(fn () => $this->record->isFavoritedByCurrentUser() ? 'heroicon-o-star' : 'heroicon-o-star')
+                ->label(fn () => $this->record->isFavoritedByCurrentUser() ? 'Unfavorite Document' : 'Favorite Document')
+                ->color(fn () => $this->record->isFavoritedByCurrentUser() ? 'warning' : 'primary')
+                ->action(function () {
+                    $isFavorited = $this->record->toggleFavorite();
+                    $message = $isFavorited ? 'Document favorited successfully!' : 'Document unfavorited successfully!';
+
+                    Notification::make()
+                        ->title($message)
+                        ->success()
+                        ->send();
+
+                    $documentOwner = $this->record->uploadedBy;
+                    $currentUser = Filament::auth()->user();
+                    if ($documentOwner && $currentUser && $documentOwner->getKey() !== $currentUser->getKey() && $isFavorited) {
+                        $documentOwner->notify(
+                            Notification::make()
+                                ->title('Your document has been favorited!')
+                                ->body('Someone favorited your document "' . $this->record->title . '"')
+                                ->actions([
+                                    NotificationAction::make('view')
+                                        ->label('View Document')
+                                        ->url(fn () => DocumentResource::getUrl('view', ['record' => $this->record]))
+                                        ->color('primary')
+                                        ->icon('heroicon-o-eye'),
+                                ])
+                                ->icon('heroicon-o-star')
+                                ->toDatabase(),
+                        );
+                        $documentOwner->notify(
+                            Notification::make()
+                                ->title('Your document has been favorited!')
+                                ->icon('heroicon-o-star')
+                                ->toBroadcast(),
+                        );
+                    }
                 }),
             Actions\Action::make('download')
                 ->icon('heroicon-o-arrow-down-tray')
