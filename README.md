@@ -11,6 +11,14 @@
 
 The Knowledge Management System (KMS) is a comprehensive academic knowledge sharing platform built with **Laravel 12** and **FilamentPHP 3**. It facilitates document management, collaborative learning, and knowledge sharing among university stakeholders including administrators, lecturers, students, and academic staff.
 
+### 🖼️ System Screenshots
+
+**Dashboard Overview**
+![KMS Dashboard](docs/kms.test_dashboard.jpg)
+
+**Forum Threads Management**
+![KMS Forum Threads](docs/kms.test_forum-threads_50.jpg)
+
 ## ✨ Key Features
 
 ### 🔐 Multi-Role Authentication
