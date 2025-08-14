@@ -83,4 +83,15 @@ class Document extends Model
     {
         return $this->belongsToMany(User::class, 'document_favorites');
     }
+
+    public function toggleFavorite(): bool
+    {
+        $isFavorited = $this->favoritedBy()->where('user_id', auth()->id())->exists();
+        if ($isFavorited) {
+            $this->favoritedBy()->detach(auth()->id());
+        } else {
+            $this->favoritedBy()->attach(auth()->id());
+        }
+        return !$isFavorited;
+    }
 }

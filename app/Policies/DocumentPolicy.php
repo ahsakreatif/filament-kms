@@ -105,4 +105,12 @@ class DocumentPolicy
     {
         return $user->can('reorder_document');
     }
+
+    /**
+     * Determine whether the user can publish the model.
+     */
+    public function publish(User $user): bool
+    {
+        return $user->can('publish_document');
+    }
 }

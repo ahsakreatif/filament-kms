@@ -351,8 +351,8 @@ class DocumentResource extends Resource implements HasShieldPermissions
                     ->color('success')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('favorites_count')
-                    ->icon('heroicon-o-heart')
-                    ->color('danger')
+                    ->icon('heroicon-o-star')
+                    ->color('warning')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
