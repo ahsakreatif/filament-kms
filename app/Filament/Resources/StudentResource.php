@@ -236,7 +236,9 @@ class StudentResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordUrl(fn (StudentProfile $record): string => StudentResource::getUrl('view', ['record' => $record]))
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

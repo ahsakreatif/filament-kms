@@ -243,7 +243,8 @@ class ForumThreadResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ])
-            ->recordUrl(fn (ForumThread $record): string => ForumThreadResource::getUrl('view', ['record' => $record]));
+            ->recordUrl(fn (ForumThread $record): string => ForumThreadResource::getUrl('view', ['record' => $record]))
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

@@ -181,7 +181,9 @@ class UserResource extends Resource
                         ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordUrl(fn (User $record): string => UserResource::getUrl('view', ['record' => $record]))
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

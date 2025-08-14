@@ -248,7 +248,9 @@ class LecturerResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            // ->recordUrl(fn (LecturerProfile $record): string => LecturerResource::getUrl('view', ['record' => $record]))
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array

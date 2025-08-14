@@ -412,7 +412,9 @@ class DocumentResource extends Resource implements HasShieldPermissions
                             return $user && $user->id === 1; // Only super admin (ID 1) can bulk delete
                         }),
                 ]),
-            ]);
+            ])
+            ->recordUrl(fn (Document $record): string => DocumentResource::getUrl('view', ['record' => $record]))
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
