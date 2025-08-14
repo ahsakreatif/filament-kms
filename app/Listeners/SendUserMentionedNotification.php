@@ -48,14 +48,6 @@ class SendUserMentionedNotification
                     ->toDatabase(),
             );
 
-            Log::info('User mentioned notification sent', [
-                'mentioned_user_id' => $mentionedUser->id,
-                'mentioned_by_user_id' => $mentionedBy->id,
-                'comment_id' => $event->comment->id,
-                'commentable_type' => get_class($event->comment->commentable),
-                'commentable_id' => $event->comment->commentable_id,
-            ]);
-
         } catch (\Exception $e) {
             Log::error('Failed to send user mentioned notification', [
                 'error' => $e->getMessage(),
