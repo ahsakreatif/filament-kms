@@ -10,11 +10,12 @@ use Spatie\Permission\Traits\HasRoles;
 use Kirschbaum\Commentions\Contracts\Commenter;
 use Filament\Models\Contracts\HasAvatar;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Traits\HasPermissions;
 
 class User extends Authenticatable implements Commenter, HasAvatar
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, HasPermissions;
 
     /**
      * The attributes that are mass assignable.

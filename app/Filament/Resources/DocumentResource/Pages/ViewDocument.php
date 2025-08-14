@@ -6,6 +6,7 @@ use App\Filament\Resources\DocumentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Facades\Filament;
+use Filament\Forms;
 
 class ViewDocument extends ViewRecord
 {
@@ -25,21 +26,34 @@ class ViewDocument extends ViewRecord
                 ->url(fn () => $this->record->file_path ? url('storage/' . $this->record->file_path) : null)
                 ->openUrlInNewTab()
                 ->visible(fn () => $this->record->file_path),
-            Actions\Action::make('approve')
-                ->icon('heroicon-o-check-circle')
-                ->label('Approve Document')
-                ->color('success')
-                ->requiresConfirmation()
-                ->action(function () {
+            Actions\Action::make('status')
+                ->icon('heroicon-o-document-check')
+                ->label('Change Status')
+                ->form([
+                    Forms\Components\Select::make('status')
+                        ->label('Document Status')
+                        ->options([
+                            'draft' => 'Draft',
+                            'published' => 'Published',
+                            'archived' => 'Archived',
+                            'flagged' => 'Flagged'
+                        ])
+                        ->required()
+                        ->default(fn () => $this->record->status)
+                ])
+                ->action(function (array $data) {
                     $this->record->update([
-                        'status' => 'published',
+                        'status' => $data['status'],
                         'approved_by' => Filament::auth()->id(),
                         'approved_at' => now(),
                     ]);
 
-                    $this->notify('success', 'Document approved successfully.');
+                    $this->notify('success', 'Document status updated successfully.');
                 })
-                ->visible(fn () => $this->record->status !== 'published'),
+                ->visible(fn () => Filament::auth()->user()->can('publish_document'))
+                ->requiresConfirmation()
+                ->modalHeading('Change Document Status')
+                ->modalDescription('Are you sure you want to change the status of this document?'),
         ];
     }
 }

@@ -16,6 +16,11 @@ class RecommendationWidget extends Widget
     public function getRecommendedThreads()
     {
         $user = Auth::user();
+
+        if (!$user->can('view_any_forum::thread')) {
+            return collect([]);
+        }
+
         $recommendationService = app(RecommendationService::class);
 
         return $recommendationService->getRecommendedThreads($user, 5);
@@ -24,6 +29,11 @@ class RecommendationWidget extends Widget
     public function getRecommendedDocuments()
     {
         $user = Auth::user();
+
+        if (!$user->can('view_any_document')) {
+            return collect([]);
+        }
+
         $recommendationService = app(RecommendationService::class);
 
         return $recommendationService->getRecommendedDocuments($user, 5);

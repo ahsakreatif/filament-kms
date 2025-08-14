@@ -19,6 +19,8 @@ use Filament\Infolists\Infolist;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Actions;
+use Filament\Actions\ActionGroup;
 
 class DocumentResource extends Resource implements HasShieldPermissions
 {
@@ -170,7 +172,7 @@ class DocumentResource extends Resource implements HasShieldPermissions
                             ->label('Featured Document')
                             ->default(false),
                     ])->columns(3)
-                    ->visible(fn () => auth()->user()->can('publish')),
+                    ->visible(fn () => Filament::auth()->user()->can('publish_document')),
             ]);
     }
 
@@ -296,6 +298,9 @@ class DocumentResource extends Resource implements HasShieldPermissions
 
     public static function table(Table $table): Table
     {
+        $user = Filament::auth()->user();
+        $canPublish = $user && $user->can('publish_document');
+
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
@@ -316,13 +321,31 @@ class DocumentResource extends Resource implements HasShieldPermissions
                         'archived' => 'warning',
                         'flagged' => 'danger',
                     })
-                    ->sortable(),
+                    ->sortable()
+                    ->hidden(fn () => $canPublish),
+                Tables\Columns\SelectColumn::make('status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'published' => 'Published',
+                        'archived' => 'Archived',
+                        'flagged' => 'Flagged',
+                    ])
+                    ->sortable()
+                    ->visible(fn () => $canPublish),
                 Tables\Columns\IconColumn::make('is_public')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->hidden(fn () => $canPublish),
+                Tables\Columns\ToggleColumn::make('is_public')
+                    ->sortable()
+                    ->visible(fn () => $canPublish),
                 Tables\Columns\IconColumn::make('is_featured')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->hidden(fn () => $canPublish),
+                Tables\Columns\ToggleColumn::make('is_featured')
+                    ->sortable()
+                    ->visible(fn () => $canPublish),
                 Tables\Columns\TextColumn::make('downloads_count')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
