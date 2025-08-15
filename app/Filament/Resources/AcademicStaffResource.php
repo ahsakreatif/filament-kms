@@ -5,9 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AcademicStaffResource\Pages;
 use App\Filament\Resources\AcademicStaffResource\RelationManagers;
 use App\Models\AcademicStaffProfile;
+use App\Models\Faculty;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -72,10 +75,10 @@ class AcademicStaffResource extends Resource
                                         ]);
 
                                         // Assign academic staff user type
-                                        $academicStaffType = \App\Models\UserType::where('name', 'academic_staff')->first();
+                                        /* $academicStaffType = \App\Models\UserType::where('name', 'academic_staff')->first();
                                         if ($academicStaffType) {
                                             $user->assignUserType($academicStaffType, null, true);
-                                        }
+                                        } */
 
                                         return $user->id;
                                     })
@@ -90,13 +93,25 @@ class AcademicStaffResource extends Resource
                             ->required()
                             ->maxLength(50)
                             ->unique(ignoreRecord: true)
-                            ->label('Academic ID'),
+                            ->label('Academic ID')
+                            ->helperText('Auto-generated based on faculty and sequence.'),
                         Forms\Components\Select::make('faculty_id')
                             ->relationship('faculty', 'name')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->label('Faculty'),
+                            ->label('Faculty')
+                            ->reactive()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $facultyId = $get('faculty_id');
+                                if (!$facultyId) {
+                                    return;
+                                }
+                                $generated = self::generateAcademicId($facultyId);
+                                if ($generated) {
+                                    $set('academic_id', $generated);
+                                }
+                            }),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Position & Responsibilities')
@@ -275,6 +290,27 @@ class AcademicStaffResource extends Resource
             'create' => Pages\CreateAcademicStaff::route('/create'),
             'edit' => Pages\EditAcademicStaff::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Generate an academic staff ID using faculty code and a per-faculty sequence number.
+     */
+    private static function generateAcademicId(?int $facultyId): ?string
+    {
+        if (!$facultyId) {
+            return null;
+        }
+
+        $faculty = Faculty::find($facultyId);
+        $facultyCode = $faculty?->code ?: (string) $facultyId;
+
+        $sequence = AcademicStaffProfile::query()
+            ->where('faculty_id', $facultyId)
+            ->count() + 1;
+
+        $sequencePadded = str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+
+        return sprintf('%s-%s', strtoupper($facultyCode), $sequencePadded);
     }
 
     public static function getEloquentQuery(): Builder

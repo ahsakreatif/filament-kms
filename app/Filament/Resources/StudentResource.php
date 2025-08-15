@@ -11,6 +11,8 @@ use App\Filament\Exports\StudentExport;
 use App\Filament\Imports\StudentImport;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -79,10 +81,10 @@ class StudentResource extends Resource
                                         ]);
 
                                         // Assign student user type
-                                        $studentType = \App\Models\UserType::where('name', 'student')->first();
+                                        /* $studentType = \App\Models\UserType::where('name', 'student')->first();
                                         if ($studentType) {
                                             $user->assignUserType($studentType, null, true);
-                                        }
+                                        } */
 
                                         return $user->id;
                                     })
@@ -97,17 +99,38 @@ class StudentResource extends Resource
                             ->required()
                             ->maxLength(50)
                             ->unique(ignoreRecord: true)
-                            ->label('Student ID'),
-                        Forms\Components\TextInput::make('study_program')
-                            ->required()
-                            ->maxLength(255)
-                            ->label('Study Program'),
-                        Forms\Components\Select::make('faculty')
+                            ->label('Student ID')
+                            ->helperText('This will automatically be generated based on the enrollment year and faculty.'),
+                        Forms\Components\Select::make('faculty_id')
                             ->relationship('faculty', 'name')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->label('Faculty'),
+                            ->label('Faculty')
+                            ->reactive()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $generated = self::generateStudentId(
+                                    facultyId: $get('faculty_id'),
+                                    enrollmentYear: $get('enrollment_year')
+                                );
+                                if ($generated) {
+                                    $set('student_id', $generated);
+                                }
+                            }),
+                        Forms\Components\Select::make('study_program_id')
+                            ->label('Study Program')
+                            ->required()
+                            ->searchable()
+                            ->preload()
+                            ->options(function ($get) {
+                                $facultyId = $get('faculty_id');
+                                if (!$facultyId) {
+                                    return \App\Models\StudyProgram::pluck('name', 'id');
+                                }
+                                return \App\Models\StudyProgram::where('faculty_id', $facultyId)->pluck('name', 'id');
+                            })
+                            ->reactive(),
+
                     ])->columns(2),
 
                 Forms\Components\Section::make('Academic Information')
@@ -117,7 +140,17 @@ class StudentResource extends Resource
                             ->numeric()
                             ->minValue(2000)
                             ->maxValue(2030)
-                            ->label('Enrollment Year'),
+                            ->label('Enrollment Year')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                                $generated = self::generateStudentId(
+                                    facultyId: $get('faculty_id'),
+                                    enrollmentYear: (int) $state
+                                );
+                                if ($generated) {
+                                    $set('student_id', $generated);
+                                }
+                            }),
                         Forms\Components\TextInput::make('current_semester')
                             ->required()
                             ->numeric()
@@ -256,6 +289,28 @@ class StudentResource extends Resource
             'view' => Pages\ViewStudent::route('/{record}'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Generate a student ID using enrollment year, faculty code, and a sequence number.
+     */
+    private static function generateStudentId(?int $facultyId, ?int $enrollmentYear): ?string
+    {
+        if (!$facultyId || !$enrollmentYear) {
+            return null;
+        }
+
+        $faculty = Faculty::find($facultyId);
+        $facultyCode = $faculty?->code ?: (string) $facultyId;
+
+        $sequence = StudentProfile::query()
+            ->where('faculty_id', $facultyId)
+            ->where('enrollment_year', $enrollmentYear)
+            ->count() + 1;
+
+        $sequencePadded = str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+
+        return sprintf('%s-%s-%s', $enrollmentYear, strtoupper($facultyCode), $sequencePadded);
     }
 
     public static function getEloquentQuery(): Builder

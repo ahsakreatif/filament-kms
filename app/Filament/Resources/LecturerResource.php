@@ -5,9 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LecturerResource\Pages;
 use App\Filament\Resources\LecturerResource\RelationManagers;
 use App\Models\LecturerProfile;
+use App\Models\Faculty;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -73,10 +76,10 @@ class LecturerResource extends Resource
                                         ]);
 
                                         // Assign lecturer user type
-                                        $lecturerType = \App\Models\UserType::where('name', 'lecturer')->first();
+                                        /* $lecturerType = \App\Models\UserType::where('name', 'lecturer')->first();
                                         if ($lecturerType) {
                                             $user->assignUserType($lecturerType, null, true);
-                                        }
+                                        } */
 
                                         return $user->id;
                                     })
@@ -91,13 +94,25 @@ class LecturerResource extends Resource
                             ->required()
                             ->maxLength(50)
                             ->unique(ignoreRecord: true)
-                            ->label('Lecturer ID'),
+                            ->label('Lecturer ID')
+                            ->helperText('Auto-generated based on faculty and sequence.'),
                         Forms\Components\Select::make('faculty_id')
                             ->relationship('faculty', 'name')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->label('Faculty'),
+                            ->label('Faculty')
+                            ->reactive()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $facultyId = $get('faculty_id');
+                                if (!$facultyId) {
+                                    return;
+                                }
+                                $generated = self::generateLecturerId($facultyId);
+                                if ($generated) {
+                                    $set('lecturer_id', $generated);
+                                }
+                            }),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Academic Information')
@@ -267,6 +282,27 @@ class LecturerResource extends Resource
             'create' => Pages\CreateLecturer::route('/create'),
             'edit' => Pages\EditLecturer::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Generate a lecturer ID using faculty code and a per-faculty sequence number.
+     */
+    private static function generateLecturerId(?int $facultyId): ?string
+    {
+        if (!$facultyId) {
+            return null;
+        }
+
+        $faculty = Faculty::find($facultyId);
+        $facultyCode = $faculty?->code ?: (string) $facultyId;
+
+        $sequence = LecturerProfile::query()
+            ->where('faculty_id', $facultyId)
+            ->count() + 1;
+
+        $sequencePadded = str_pad((string) $sequence, 4, '0', STR_PAD_LEFT);
+
+        return sprintf('%s-%s', strtoupper($facultyCode), $sequencePadded);
     }
 
     public static function getEloquentQuery(): Builder
