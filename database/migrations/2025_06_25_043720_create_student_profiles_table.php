@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('student_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
-            $table->string('student_id', 50)->unique();
-            $table->foreignId('study_program_id')->constrained()->onDelete('cascade');
-            $table->foreignId('faculty_id')->constrained()->onDelete('cascade');
-            $table->integer('enrollment_year');
-            $table->integer('current_semester');
+            $table->string('student_id', 50)->unique()->nullable();
+            $table->foreignId('study_program_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('faculty_id')->nullable()->constrained()->onDelete('cascade');
+            $table->integer('enrollment_year')->nullable();
+            $table->integer('current_semester')->nullable();
             $table->decimal('gpa', 3, 2)->nullable();
             $table->foreignId('advisor_id')->nullable()->constrained('lecturer_profiles')->onDelete('set null');
             $table->enum('status', ['active', 'graduated', 'suspended', 'dropped'])->default('active');

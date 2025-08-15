@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_type_id')->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('profile_id'); // ID from the specific profile table
+            $table->unsignedBigInteger('profile_id')->nullable(); // ID from the specific profile table
             $table->boolean('is_primary')->default(false); // User can have multiple types, but one primary
             $table->timestamp('assigned_at')->useCurrent();
             $table->foreignId('assigned_by')->nullable()->constrained('users')->onDelete('set null');

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('lecturer_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
-            $table->string('lecturer_id', 50)->unique();
-            $table->foreignId('faculty_id')->constrained()->onDelete('cascade');
+            $table->string('lecturer_id', 50)->unique()->nullable();
+            $table->foreignId('faculty_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('specialization')->nullable();
             $table->enum('academic_rank', ['assistant', 'lecturer', 'associate_professor', 'professor']);
             $table->string('qualification')->nullable(); // PhD, Master, etc.

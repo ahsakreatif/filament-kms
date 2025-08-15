@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('academic_staff_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
-            $table->string('academic_id', 50)->unique();
-            $table->foreignId('faculty_id')->constrained()->onDelete('cascade');
-            $table->string('position'); // Head of Department, Dean, etc.
+            $table->string('academic_id', 50)->unique()->nullable();
+            $table->foreignId('faculty_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('position')->nullable(); // Head of Department, Dean, etc.
             $table->string('office_location')->nullable();
             $table->text('responsibilities')->nullable();
             $table->enum('status', ['active', 'inactive', 'retired'])->default('active');
