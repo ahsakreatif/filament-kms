@@ -3,10 +3,13 @@
 namespace App\Filament\Imports;
 
 use App\Models\StudentProfile;
+use App\Models\Faculty;
+use App\Models\StudyProgram;
 use App\Models\User;
 use App\Models\UserType;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
+use Filament\Actions\Imports\Models\Import;
 use Illuminate\Support\Facades\Hash;
 
 class StudentImport extends Importer
@@ -18,36 +21,27 @@ class StudentImport extends Importer
         return [
             ImportColumn::make('user_name')
                 ->label('Student Name')
-                ->required()
                 ->rules(['required', 'string', 'max:255']),
             ImportColumn::make('user_email')
                 ->label('Email')
-                ->required()
-                ->rules(['required', 'email', 'unique:users,email'])
-                ->unique(ignoreRecord: true),
+                ->rules(['required', 'email', 'unique:users,email']),
             ImportColumn::make('user_phone')
                 ->label('Phone')
                 ->rules(['nullable', 'string', 'max:20']),
             ImportColumn::make('student_id')
                 ->label('Student ID')
-                ->required()
-                ->rules(['required', 'string', 'max:50', 'unique:student_profiles,student_id'])
-                ->unique(ignoreRecord: true),
-            ImportColumn::make('study_program')
-                ->label('Study Program')
-                ->required()
-                ->rules(['required', 'string', 'max:255']),
-            ImportColumn::make('faculty')
-                ->label('Faculty')
-                ->required()
-                ->rules(['required', 'string', 'max:255']),
+                ->rules(['required', 'string', 'max:50', 'unique:student_profiles,student_id']),
+            ImportColumn::make('study_program_code')
+                ->label('Study Program Code')
+                ->rules(['required', 'exists:study_programs,code']),
+            ImportColumn::make('faculty_code')
+                ->label('Faculty Code')
+                ->rules(['required', 'exists:faculties,code']),
             ImportColumn::make('enrollment_year')
                 ->label('Enrollment Year')
-                ->required()
                 ->rules(['required', 'integer', 'min:2000', 'max:2030']),
             ImportColumn::make('current_semester')
                 ->label('Current Semester')
-                ->required()
                 ->rules(['required', 'integer', 'min:1', 'max:14']),
             ImportColumn::make('gpa')
                 ->label('GPA')
@@ -57,7 +51,6 @@ class StudentImport extends Importer
                 ->rules(['nullable', 'email', 'exists:users,email']),
             ImportColumn::make('status')
                 ->label('Status')
-                ->required()
                 ->rules(['required', 'in:active,graduated,suspended,dropped'])
                 ->options([
                     'active' => 'Active',
@@ -72,35 +65,27 @@ class StudentImport extends Importer
     {
         return [
             ImportColumn::make('user_name')
-                ->label('Student Name')
-                ->required(),
+                ->label('Student Name'),
             ImportColumn::make('user_email')
-                ->label('Email')
-                ->required(),
+                ->label('Email'),
             ImportColumn::make('user_phone')
                 ->label('Phone'),
             ImportColumn::make('student_id')
-                ->label('Student ID')
-                ->required(),
-            ImportColumn::make('study_program')
-                ->label('Study Program')
-                ->required(),
-            ImportColumn::make('faculty')
-                ->label('Faculty')
-                ->required(),
+                ->label('Student ID'),
+            ImportColumn::make('study_program_code')
+                ->label('Study Program Code'),
+            ImportColumn::make('faculty_code')
+                ->label('Faculty Code'),
             ImportColumn::make('enrollment_year')
-                ->label('Enrollment Year')
-                ->required(),
+                ->label('Enrollment Year'),
             ImportColumn::make('current_semester')
-                ->label('Current Semester')
-                ->required(),
+                ->label('Current Semester'),
             ImportColumn::make('gpa')
                 ->label('GPA'),
             ImportColumn::make('advisor_email')
                 ->label('Advisor Email'),
             ImportColumn::make('status')
                 ->label('Status')
-                ->required()
                 ->options([
                     'active' => 'Active',
                     'graduated' => 'Graduated',
@@ -108,6 +93,11 @@ class StudentImport extends Importer
                     'dropped' => 'Dropped',
                 ]),
         ];
+    }
+
+    public static function getCompletedNotificationBody(Import $import): string
+    {
+        return 'Student import completed.';
     }
 
     public function resolveRecord(): ?StudentProfile
@@ -144,6 +134,23 @@ class StudentImport extends Importer
 
         // Set the user_id for the student profile
         $this->record->user_id = $user->id;
+
+        // Map faculty and study program by code to their IDs
+        if (!empty($this->data['faculty_code'])) {
+            $faculty = Faculty::where('code', $this->data['faculty_code'])->first();
+            if ($faculty) {
+                $this->record->faculty_id = $faculty->id;
+
+                if (!empty($this->data['study_program_code'])) {
+                    $program = StudyProgram::where('code', $this->data['study_program_code'])
+                        ->where('faculty_id', $faculty->id)
+                        ->first();
+                    if ($program) {
+                        $this->record->study_program_id = $program->id;
+                    }
+                }
+            }
+        }
 
         // Set advisor if provided
         if (!empty($this->data['advisor_email'])) {

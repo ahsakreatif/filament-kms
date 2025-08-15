@@ -212,7 +212,7 @@ class StudentResource extends Resource
                     ->sortable()
                     ->badge()
                     ->color('primary'),
-                Tables\Columns\TextColumn::make('study_program.name')
+                Tables\Columns\TextColumn::make('studyProgram.name')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('faculty.name')
                     ->sortable(),

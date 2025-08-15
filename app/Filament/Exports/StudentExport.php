@@ -15,30 +15,23 @@ class StudentExport extends Exporter
     {
         return [
             ExportColumn::make('user.name')
-                ->label('Student Name')
-                ->required(),
+                ->label('Student Name'),
             ExportColumn::make('student_id')
-                ->label('Student ID')
-                ->required(),
-            ExportColumn::make('study_program')
-                ->label('Study Program')
-                ->required(),
-            ExportColumn::make('faculty')
-                ->label('Faculty')
-                ->required(),
+                ->label('Student ID'),
+            ExportColumn::make('studyProgram.code')
+                ->label('Study Program Code'),
+            ExportColumn::make('faculty.code')
+                ->label('Faculty Code'),
             ExportColumn::make('enrollment_year')
-                ->label('Enrollment Year')
-                ->required(),
+                ->label('Enrollment Year'),
             ExportColumn::make('current_semester')
-                ->label('Current Semester')
-                ->required(),
+                ->label('Current Semester'),
             ExportColumn::make('gpa')
                 ->label('GPA'),
             ExportColumn::make('advisor.name')
                 ->label('Academic Advisor'),
             ExportColumn::make('status')
-                ->label('Status')
-                ->required(),
+                ->label('Status'),
             ExportColumn::make('user.email')
                 ->label('Email'),
             ExportColumn::make('user.phone')
