@@ -91,6 +91,8 @@ return [
                     'https://www.kms.ahsakreatif.com',
                     'http://www.kms.ahsakreatif.com',
                     'http://kms.test',
+                    'https://ws.kms.ahsakreatif.com',
+                    'wss://kms.ahsakreatif.com',
                 ],
                 'ping_interval' => env('REVERB_APP_PING_INTERVAL', 60),
                 'activity_timeout' => env('REVERB_APP_ACTIVITY_TIMEOUT', 30),
