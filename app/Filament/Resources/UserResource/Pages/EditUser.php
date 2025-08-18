@@ -19,6 +19,12 @@ class EditUser extends EditRecord
         ];
     }
 
+    protected function beforeSave(): void
+    {
+        $state = $this->getState();
+        dd($state);
+    }
+
     protected function afterSave(): void
     {
         $record = $this->record;

@@ -33,7 +33,8 @@ class ForumViewThread extends ViewRecord
             Action::make('edit')
                 ->label('Edit Thread')
                 ->url(fn () => ForumThreadResource::getUrl('edit', ['record' => $this->record]))
-                ->color('primary'),
+                ->color('primary')
+                ->visible(fn (): bool => $this->record->user_id === Filament::auth()->user()->id),
             Action::make('like')
                 ->label(fn (): string => $this->record->isLikedByCurrentUser() ? 'Unlike' : 'Like')
                 ->icon(fn (): string => $this->record->isLikedByCurrentUser() ? 'heroicon-o-heart' : 'heroicon-o-heart')

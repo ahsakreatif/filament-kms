@@ -80,6 +80,11 @@ class StudentResource extends Resource
                                             'is_active' => true,
                                         ]);
 
+                                        // set email verified at
+                                        $user->email_verified_at = now();
+                                        $user->is_active = true;
+                                        $user->save();
+
                                         // Assign student user type
                                         /* $studentType = \App\Models\UserType::where('name', 'student')->first();
                                         if ($studentType) {

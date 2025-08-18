@@ -39,7 +39,7 @@ class ForumThreadPolicy
      */
     public function update(User $user, ForumThread $forumThread): bool
     {
-        return $user->can('update_forum::thread');
+        return $user->id === $forumThread->user_id;
     }
 
     /**
@@ -47,7 +47,7 @@ class ForumThreadPolicy
      */
     public function delete(User $user, ForumThread $forumThread): bool
     {
-        return $user->can('delete_forum::thread');
+        return $user->id === $forumThread->user_id;
     }
 
     /**
@@ -55,7 +55,8 @@ class ForumThreadPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_forum::thread');
+        // Prevent bulk deletion to ensure users cannot remove threads they do not own
+        return false;
     }
 
     /**
@@ -63,7 +64,7 @@ class ForumThreadPolicy
      */
     public function forceDelete(User $user, ForumThread $forumThread): bool
     {
-        return $user->can('force_delete_forum::thread');
+        return $user->id === $forumThread->user_id;
     }
 
     /**
@@ -71,7 +72,7 @@ class ForumThreadPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_forum::thread');
+        return false;
     }
 
     /**

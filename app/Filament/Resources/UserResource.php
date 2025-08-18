@@ -50,18 +50,6 @@ class UserResource extends Resource
                             ->avatar()
                             ->directory('avatars')
                             ->maxSize(2048),
-                    ])->columns(2),
-
-                Forms\Components\Section::make('Authentication')
-                    ->schema([
-                        Forms\Components\TextInput::make('password')
-                            ->password()
-                            ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                            ->dehydrated(fn ($state) => filled($state))
-                            ->required(fn (string $context): bool => $context === 'create')
-                            ->maxLength(255),
-                        Forms\Components\DateTimePicker::make('email_verified_at')
-                            ->label('Email Verified At'),
                         Forms\Components\Toggle::make('is_active')
                             ->label('Active Account')
                             ->default(true),
@@ -166,6 +154,25 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('reset_password')
+                    ->label('Reset Password')
+                    ->icon('heroicon-o-key')
+                    ->color('warning')
+                    ->modalHeading('Reset Password')
+                    ->modalDescription('Enter a new password for this user.')
+                    ->form([
+                        \Filament\Forms\Components\TextInput::make('password')
+                            ->label('New Password')
+                            ->password()
+                            ->required()
+                            ->minLength(8),
+                    ])
+                    ->modalSubmitActionLabel('Reset Password')
+                    ->modalCancelActionLabel('Cancel')
+                    ->action(function (array $data, User $record) {
+                        $record->password = \Illuminate\Support\Facades\Hash::make($data['password']);
+                        $record->save();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

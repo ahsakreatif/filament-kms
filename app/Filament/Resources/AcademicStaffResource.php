@@ -74,6 +74,11 @@ class AcademicStaffResource extends Resource
                                             'is_active' => true,
                                         ]);
 
+                                        // set email verified at
+                                        $user->email_verified_at = now();
+                                        $user->is_active = true;
+                                        $user->save();
+
                                         // Assign academic staff user type
                                         /* $academicStaffType = \App\Models\UserType::where('name', 'academic_staff')->first();
                                         if ($academicStaffType) {
