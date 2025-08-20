@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\HasDocumentStats;
+use Filament\Facades\Filament;
 
 class Document extends Model
 {
@@ -86,12 +87,30 @@ class Document extends Model
 
     public function toggleFavorite(): bool
     {
-        $isFavorited = $this->favoritedBy()->where('user_id', auth()->id())->exists();
+        $userId = Filament::auth()->id();
+
+        $isFavorited = $this->favoritedBy()->where('user_id', $userId)->exists();
         if ($isFavorited) {
-            $this->favoritedBy()->detach(auth()->id());
+            $this->favoritedBy()->detach($userId);
         } else {
-            $this->favoritedBy()->attach(auth()->id());
+            $this->favoritedBy()->attach($userId);
         }
         return !$isFavorited;
+    }
+
+    public function recordDownload(): void
+    {
+        $userId = Filament::auth()->id();
+        $ipAddress = request()->ip();
+        $userAgent = request()->userAgent();
+
+        $this->downloads()->create([
+            'user_id' => $userId,
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent,
+            'downloaded_at' => now(),
+        ]);
+
+        $this->increment('downloads_count');
     }
 }

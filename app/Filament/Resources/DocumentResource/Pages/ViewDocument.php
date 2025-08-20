@@ -62,10 +62,16 @@ class ViewDocument extends ViewRecord
                 }),
             Actions\Action::make('download')
                 ->icon('heroicon-o-arrow-down-tray')
-                ->label('Download Document')
-                ->url(fn () => $this->record->file_path ? url('storage/' . $this->record->file_path) : null)
-                ->openUrlInNewTab()
-                ->visible(fn () => $this->record->file_path),
+                ->label('Download')
+                ->visible(fn () => $this->record->file_path)
+                ->action(function () {
+                    $this->record->recordDownload();
+                    return response()->streamDownload(function () {
+                        readfile(storage_path('app/public/' . $this->record->file_path));
+                    }, $this->record->file_name, [
+                        'Content-Type' => $this->record->mime_type,
+                    ]);
+                }),
             Actions\Action::make('status')
                 ->icon('heroicon-o-document-check')
                 ->label('Change Status')

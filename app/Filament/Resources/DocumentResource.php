@@ -401,7 +401,7 @@ class DocumentResource extends Resource implements HasShieldPermissions
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                                                Tables\Actions\EditAction::make()
+                Tables\Actions\EditAction::make()
                     ->visible(function (Document $record): bool {
                         $user = Filament::auth()->user();
                         return $user && $record->uploaded_by === $user->id;
@@ -425,7 +425,14 @@ class DocumentResource extends Resource implements HasShieldPermissions
                     ->visible(fn (Document $record): bool => $record->status !== 'published'),
                 Tables\Actions\Action::make('download')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn (Document $record): string => $record->file_path)
+                    ->action(function (Document $record) {
+                        $record->recordDownload();
+                        return response()->streamDownload(function () use ($record) {
+                            readfile(storage_path('app/public/' . $record->file_path));
+                        }, $record->file_name, [
+                            'Content-Type' => $record->mime_type,
+                        ]);
+                    })
                     ->openUrlInNewTab(),
             ])
             ->bulkActions([
