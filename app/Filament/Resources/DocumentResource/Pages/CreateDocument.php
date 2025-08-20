@@ -23,8 +23,8 @@ class CreateDocument extends CreateRecord
         }
 
         // Extract file metadata if file is uploaded
-        if (isset($data['file_path']) && is_array($data['file_path'])) {
-            $filePath = $data['file_path'][0] ?? null;
+        if (isset($data['file_path'])) {
+            $filePath = $data['file_path'];
             if ($filePath) {
                 $fullPath = storage_path('app/public/' . $filePath);
                 if (file_exists($fullPath)) {

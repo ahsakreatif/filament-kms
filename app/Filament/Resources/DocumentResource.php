@@ -116,7 +116,8 @@ class DocumentResource extends Resource implements HasShieldPermissions
                             ->acceptedFileTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'])
                             ->maxSize(50 * 1024) // 50MB
                             ->directory('documents')
-                            ->disabled(fn ($context) => $context === 'edit'),
+                            ->disabled(fn ($context) => $context === 'edit')
+                            ->helperText('Upload a PDF, DOC, DOCX, PPT, or PPTX file, document can\'t be more than 50MB, and can\'t be reuploaded on edit'),
                     ]),
 
                 Forms\Components\Section::make('Classification')
